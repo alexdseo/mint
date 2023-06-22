@@ -64,7 +64,7 @@ def train_fasttext(txt_file, edamam_df):
     # Get average word embeddings of the menu items
     ft_we = list()
     for menu in tqdm(word_tokens):
-        tmp = []
+        tmp = list()
         for w in menu:
             try:
                 # Get each word embeddings
