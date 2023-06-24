@@ -75,8 +75,8 @@ class food_category():
 
     def clustering(self):
         # Divide into 5-fold of training and test dataset
-        kf_1_tr, _, kf_2_ts, _, kf_3_tr, _, kf_4_tr, _, kf_5_tr, _ = set_fold(self.se_df)
-        folds_tr_ind = [kf_1_tr, kf_2_ts, kf_3_tr, kf_4_tr, kf_5_tr]
+        kf_1_tr, _, kf_2_tr, _, kf_3_tr, _, kf_4_tr, _, kf_5_tr, _ = set_fold(self.se_df)
+        folds_tr_ind = [kf_1_tr, kf_2_tr, kf_3_tr, kf_4_tr, kf_5_tr]
         # Set seed
         np.random.seed(2023)
         for i, fold_ind in enumerate(folds_tr_ind):
