@@ -6,3 +6,6 @@
 
 #.idea
 .idea
+
+# pycache
+*.pyc
