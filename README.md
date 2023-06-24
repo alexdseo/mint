@@ -25,6 +25,6 @@ pip install -r requirements.txt
 
 ## Usage
 
-MINT is trained with a high-quality dataset that contains generic food items - canonical foods, including everything from individual raw foods to complex meals – which includes their ingredients and nutrient composition information. For more details about the datasets used to create MINT, please see [`data`](https://github.com/alexdseo/mint/tree/main/data).
+MINT is trained with a high-quality dataset that contains generic food items - canonical foods, including everything from individual raw foods to complex meals – which includes their ingredients and nutrient composition information. For more details about the datasets used to create MINT, please see [`data`](https://github.com/alexdseo/mint/blob/main/data/README.md).
 
-MINT consists of 2 prediction models: the food category prediction model and the nutrition quality prediction model. After getting all the datasets required to run MINT, to make predictions on nutrition quality/individual nutrients based on menu item names, please see [`modeling`](https://github.com/alexdseo/mint/tree/main/modeling). 
+MINT consists of 2 prediction models: the food category prediction model and the nutrition quality prediction model. After getting all the datasets required to run MINT, to make predictions on nutrition quality/individual nutrients based on menu item names, please see [`modeling`](https://github.com/alexdseo/mint/tree/main/modeling/README.md). 
