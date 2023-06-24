@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import hdbscan
 import umap
-from utils import *
+from modeling.utils import *
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 
