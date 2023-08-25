@@ -28,7 +28,7 @@ def get_weighted_mean(num_lb, nutri, y_true_train_base, y_true_test_base, y_pred
     # Get true mean nutrition score for each food category
     true_mean = list()
     for i in range(num_lb):
-        true_mean.append(y_true_train_base.loc[y_true_train_base['sc'] == i]['nutri'].mean())
+        true_mean.append(y_true_train_base.loc[y_true_train_base['sc'] == i][nutri].mean())
     # Make prediction by calculating weighted mean from food category prediction
     pred = list()
     for i in range(len(y_pred_test_base)):
