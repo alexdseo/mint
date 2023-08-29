@@ -12,6 +12,7 @@ Here we explain how to run the MINT pipeline, to make the food category and nutr
 > This Python script includes the neural network architectures for the food category prediction model and nutrition prediction model. These models will be called in `models.py`.
 - `models.py`:
 > This Python script includes the functions to call the MINT and its comparisons used in our ablation study. `clustering.py` needs to be run prior to running this script.
-> 2 arguments required: 'nutrition density score', either RRR or RRR_m1. 'folds', from kf1 to kf5 that use want to test on.
+
+> 2 arguments required: 'nutrition density score', either RRR or RRR_m1. 'folds', from kf1 to kf5 that user want to test on.
 
 ![clustering example](https://github.com/alexdseo/mint/blob/main/figures/clustering.png)
