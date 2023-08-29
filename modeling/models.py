@@ -177,8 +177,8 @@ def finetune(train_X, test_X, train_dict, test_dict, nutri, ft):
     preds, ci = np.array([]), np.array([])
     for i, fc in enumerate(train_dict.keys()):
         # Get X data for each task
-        X_sc = train_X.iloc[train_dict[fc].index]
-        X_sc_t = test_X.iloc[test_dict[fc].index]
+        X_sc = train_X[train_dict[fc].index]
+        X_sc_t = test_X[test_dict[fc].index]
         # Get prediction for individual task
         y_sc, y_sc_ci = task_model(X_sc, X_sc_t, train_dict[fc][nutri], ft)
         # Concatenate the prediction from different food categories
