@@ -8,6 +8,7 @@ from keras.callbacks import EarlyStopping
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler
 from sklearn.metrics import r2_score
 import scipy.stats as st
+import sys
 
 
 def preprocessing(train_df):
@@ -37,7 +38,7 @@ def get_weighted_mean(num_lb, nutri, y_true_train_base, y_true_test_base, y_pred
     print('Baseline Test r-squared: %f' % r2_score(y_true_test_base[nutri], pred))
 
 
-def baseline(n, train_X, test_X, train_y, test_y):
+def baseline(n, train_X, test_X, train_y, test_y, score):
     # Set seed
     np.random.seed(2023)
     # One hot encoding for the classification label
@@ -60,7 +61,7 @@ def baseline(n, train_X, test_X, train_y, test_y):
     for i in range(len(y_pred_target)):
         ts_label.append(np.argmax(y_pred_target[i]))
     # Get baseline result # User can change to different nutrition density score: 'RRR_m1'
-    get_weighted_mean(n, 'RRR', train_y, test_y, y_pred_target)
+    get_weighted_mean(n, score, train_y, test_y, y_pred_target)
     # Save predicted food category for test dataset
     test_y['sc'] = pd.Series(ts_label)
 
@@ -79,12 +80,12 @@ def predict_point(X, model, num_samples):
     return pred_dist, pred_dist.mean(axis=1)
 
 
-def mlp(train_X, test_X, train_y, test_y):
+def mlp(train_X, test_X, train_y, test_y, score, kf):
     # Set seed
     np.random.seed(2023)
     # Normalize the nutrition density score # User can change and try with RRR-macro
     y_sc = StandardScaler()
-    Ny_train = y_sc.fit_transform(np.array(train_y['RRR']).reshape(-1, 1))
+    Ny_train = y_sc.fit_transform(np.array(train_y[score]).reshape(-1, 1))
     # Call nutrition classification model
     model = nutrition_prediction_model()
     # Set learning rate
@@ -97,11 +98,11 @@ def mlp(train_X, test_X, train_y, test_y):
     # Fit model
     history = model.fit(train_X, Ny_train, validation_split=0.2, epochs=100, batch_size=64, verbose=2, callbacks=[es])
     # Save model weights # User need to change the name of the weights for different fold
-    model.save_weights('RRR_weights_kf2')
+    model.save_weights(score + '_weights_' + kf)
     # Bayesian Approximation using MC dropout
     _, y_pred = predict_point(np.array(test_X), model, 100)
     y_pred = y_pred.reshape(-1, 1)
-    print('MLP Test r-squared: %f' % r2_score(test_y['RRR'], y_sc.inverse_transform(y_pred)))
+    print('MLP Test r-squared: %f' % r2_score(test_y[score], y_sc.inverse_transform(y_pred)))
 
 
 def mint_preprocessing(num_lb, train_y, test_y):
@@ -117,7 +118,7 @@ def mint_preprocessing(num_lb, train_y, test_y):
     ts_fc_df_lst = list()
     for i in range(num_lb):
         ts_fc_df_lst.append(test_y.loc[test_y['sc'] == i])
-    ts_fc_df_tuple = tuple(tr_fc_df_lst)
+    ts_fc_df_tuple = tuple(ts_fc_df_lst)
 
     # Save tuples into dictionary
     training_result_dict = dict(zip(fc_name_tuple, tr_fc_df_tuple))
@@ -174,15 +175,19 @@ def finetune(train_X, test_X, train_dict, test_dict, nutri, ft):
     # Individual task
     # Define empty placeholder
     preds, ci = np.array([]), np.array([])
-    for fc in train_dict.keys():
+    for i, fc in enumerate(train_dict.keys()):
         # Get X data for each task
         X_sc = train_X.iloc[train_dict[fc].index]
         X_sc_t = test_X.iloc[test_dict[fc].index]
         # Get prediction for individual task
         y_sc, y_sc_ci = task_model(X_sc, X_sc_t, train_dict[fc][nutri], ft)
         # Concatenate the prediction from different food categories
-        preds = np.hstack([preds, y_sc], axis=0)
-        ci = np.concatenate((ci, y_sc_ci), axis=0)
+        if i == 0:
+            pred = y_sc
+            ci = y_sc_ci
+        else:
+            preds = np.concatenate([preds, y_sc], axis=0)
+            ci = np.concatenate([ci, y_sc_ci], axis=0)
 
     # Save each menu item's true RRR and their food category
     # Define empty placeholder
@@ -195,35 +200,37 @@ def finetune(train_X, test_X, train_dict, test_dict, nutri, ft):
     return tests, preds, ci
 
 
-def mint(n, train_X, test_X, train_y, test_y):
+def mint(n, train_X, test_X, train_y, test_y, score , kf):
     # Divide dataset into categories
     train_dict, test_dict = mint_preprocessing(n, train_y, test_y)
     # Finetune by the food category
-    true_test, pred_test, ci_test = finetune(train_X, test_X, train_dict, test_dict, 'RRR', 'RRR_weights_kf2')
+    true_test, pred_test, ci_test = finetune(train_X, test_X, train_dict, test_dict, score, score + '_weights_' + kf)
     # Save results in a dataframes
-    pred = pd.DataFrame(pred_test, columns=['Predicted RRR']).reset_index(drop=True)
+    pred = pd.DataFrame(pred_test, columns=['Predicted ' + score]).reset_index(drop=True)
     test = pd.DataFrame(true_test).reset_index(drop=True)
     ci = pd.DataFrame(ci_test, columns=['lower_ci', 'upper_ci']).reset_index(drop=True)
     final_results = pd.concat([test, pred, ci], axis=1)
     # Print mint r2 score
-    print('MINT Test r-squared: %f' % r2_score(final_results['RRR'], final_results['Predicted RRR']))
+    print('MINT Test r-squared: %f' % r2_score(final_results[score], final_results['Predicted ' + score]))
     # Export the result
-    final_results.to_csv('MINT_pred_RRR.csv', encoding='utf-8', index=False)
+    final_results.to_csv('MINT_pred_'+ score + '_' + kf + '.csv', encoding='utf-8', index=False)
 
 
 if __name__ == "__main__":
     # Set seed
     np.random.seed(2023)
     # Read one of the fold's training and test index # Created using utils.set_fold
+    nds = sys.argv[1]  # nutrition desnsity score # ex) RRR or RRR_m1
+    fold = sys.argv[2]  # one of the folds to test on # ex) kf1 ~ kf5
     # User can change this part and try different folds
-    train_ind = np.load('kf2_tr.npy')
-    test_ind = np.load('kf2_ts.npy')
+    train_ind = np.load(fold + '_tr.npy')
+    test_ind = np.load(fold + '_ts.npy')
     # Read FastText embeddings
     X = np.load('../data/edamam_menu_embedding.npy')
     # Define training and test dataset
     X_train, X_test = X[train_ind], X[test_ind]
     # Read one of the fold that was created from the clustering.py
-    y_train = pd.read_csv('target_kf2.csv')
+    y_train = pd.read_csv('target_' + fold + '.csv')
     num_sc = len(set(y_train['sc']))
     # Full dataset without fodd category
     y = pd.read_csv('../data/edamam_nutrition_sample.csv')
@@ -234,6 +241,6 @@ if __name__ == "__main__":
     # Run baseline method and get the predicted food category for the test dataset
     y_test = baseline(num_sc, X_train, X_test, y_train, y_test)
     # Run simple mlp method and save weight for mint
-    mlp(X_train, X_test, y_train, y_test)
+    mlp(X_train, X_test, y_train, y_test, nds , fold)
     # Run MINT
     mint(num_sc, X_train, X_test, y_train, y_test)
