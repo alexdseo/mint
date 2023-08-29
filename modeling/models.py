@@ -219,9 +219,10 @@ def mint(n, train_X, test_X, train_y, test_y, score , kf):
 if __name__ == "__main__":
     # Set seed
     np.random.seed(2023)
-    # Read one of the fold's training and test index # Created using utils.set_fold
+    # Get arguments for score and fold that wanted to test 
     nds = sys.argv[1]  # nutrition desnsity score # ex) RRR or RRR_m1
     fold = sys.argv[2]  # one of the folds to test on # ex) kf1 ~ kf5
+    # Read one of the fold's training and test index # Created using utils.set_fold
     # User can change this part and try different folds
     train_ind = np.load(fold + '_tr.npy')
     test_ind = np.load(fold + '_ts.npy')
