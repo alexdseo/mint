@@ -239,8 +239,8 @@ if __name__ == "__main__":
     y_test = nutrient_density_score(y_test)
 
     # Run baseline method and get the predicted food category for the test dataset
-    y_test = baseline(num_sc, X_train, X_test, y_train, y_test)
+    y_test = baseline(num_sc, X_train, X_test, y_train, y_test, nds)
     # Run simple mlp method and save weight for mint
-    mlp(X_train, X_test, y_train, y_test, nds , fold)
+    mlp(X_train, X_test, y_train, y_test, nds, fold)
     # Run MINT
-    mint(num_sc, X_train, X_test, y_train, y_test)
+    mint(num_sc, X_train, X_test, y_train, y_test, nds, fold)
