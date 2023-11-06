@@ -53,7 +53,7 @@ def baseline(n, train_X, test_X, train_y, test_y, score):
     # Early stopping
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10)
     # Fit model
-    history = model.fit(X_train, ohe_train, validation_split=0.2, epochs=100, batch_size=64, verbose=2, callbacks=[es])
+    history = model.fit(train_X, ohe_train, validation_split=0.2, epochs=100, batch_size=64, verbose=2, callbacks=[es])
     # Predict food category for test dataset
     y_pred_target = model.predict(test_X)
     # Assign one label from the prediction, this will be used later for mint's fine-tuning process
