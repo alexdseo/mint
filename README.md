@@ -1,6 +1,6 @@
-# Predicting the Nutritional Quality of a Restaurant Menu
+# Predicting the Nutritional Quality of a Food Environments
 
-MINT: Menu Item to NutrienT is a new pipeline to capture the nutritional quality of a restaurant through menu item names. This repository contains code to reproduce the results using MINT that was introduced in our paper "What’s On the Menu? Towards Predicting the Nutritional Quality of a Restaurant Menu", submitted to EMNLP 2023.
+MINT: Menu Item to NutrienT is a new pipeline to capture the nutritional quality of a restaurant through menu item names. This repository contains code to reproduce the results using MINT that was introduced in our paper "What’s On the Menu? Towards Predicting Nutritional Quality of Food Environments", submitted to ML4H 2023.
 
 ## Description
 
