@@ -1,7 +1,7 @@
 # python=3.9
 numpy==1.23.2
-tensorflow-deps==2.10.0
-tensorflow-macos==2.10.0 # If using MacOS
+tensorflow-deps==2.14.0
+tensorflow-macos==2.14.0 # If using MacOS
 tensorflow-metal==0.6.0
 pandas==1.5.3
 tqdm==4.64.1
