@@ -148,25 +148,19 @@ def task_model(X_train_sm, X_test_sm, y_train_sm, weights):
                                callbacks=[es])
     # Bayesian Approximation using MC dropout
     y_pred_dist, y_pred = predict_point(np.array(X_test_sm), target_model, 100)
-    y_pred = y_pred.reshape(-1, 1)
     # Inverse transform to real value
-    y_pred = y_sc.inverse_transform(y_pred)
+    y_pred = y_sc.inverse_transform(y_pred.reshape(-1, 1))
     # Get CI
-    lower_ci, upper_ci = list(), list()
+    lower_ci, upper_ci = [], []
     # Create 95% confidence interval for population mean weight
     for i in range(len(y_pred_dist)):
-        lci = st.t.interval(alpha=0.95, df=len(y_pred_dist[i]) - 1, loc=np.mean(y_pred_dist[i]),
-                            scale=st.sem(y_pred_dist[i]))[0]
-        uci = st.t.interval(alpha=0.95, df=len(y_pred_dist[i]) - 1, loc=np.mean(y_pred_dist[i]),
-                            scale=st.sem(y_pred_dist[i]))[1]
+        lci = st.norm.interval(confidence=0.95, loc=np.mean(y_pred_dist[i]), scale=st.sem(y_pred_dist[i]))[0]
+        uci = st.norm.interval(confidence=0.95, loc=np.mean(y_pred_dist[i]), scale=st.sem(y_pred_dist[i]))[1]
         lower_ci.append(lci)
         upper_ci.append(uci)
 
-    lower_ci = np.array(lower_ci).reshape(-1, 1)
-    upper_ci = np.array(upper_ci).reshape(-1, 1)
-    lower_ci = y_sc.inverse_transform(lower_ci)
-    upper_ci = y_sc.inverse_transform(upper_ci)
-    ci = np.concatenate([lower_ci, upper_ci], axis=1)
+    ci = np.concatenate([y_sc.inverse_transform(np.array(lower_ci).reshape(-1, 1)), y_sc.inverse_transform(np.array(upper_ci).reshape(-1, 1))], axis=1)
+
 
     return y_pred, ci
 
