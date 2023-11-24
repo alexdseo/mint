@@ -137,7 +137,7 @@ def task_model(X_train_sm, X_test_sm, y_train_sm, weights):
     # Load weights
     target_model.load_weights(weights)
     # Set learning rate
-    opt = keras.optimizers.Adam(learning_rate=0.001)
+    opt = keras.optimizers.Adam(learning_rate=0.0001, weight_decay =0.001)
     # Compile, regression task
     target_model.compile(loss='mean_squared_error', optimizer=opt, metrics=['mae'])
     # print(model.summary())

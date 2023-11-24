@@ -19,12 +19,13 @@ def food_category_classification_model(X_train, n, dim=300):
     """
     # Set seed
     np.random.seed(2023)
-    # Feature Normalization
-    embedding_normalizer = Normalization(input_shape=[dim, ], axis=None)
-    embedding_normalizer.adapt(X_train)
+    # # Feature Normalization
+    # embedding_normalizer = Normalization(input_shape=[dim, ], axis=None)
+    # embedding_normalizer.adapt(X_train)
     # Classification model architecture #Best parameter from gridsearch
     classification_model = Sequential([
-        embedding_normalizer,
+        #embedding_normalizer,
+        tf.keras.Input(shape=(dim,)),
         Dense(256, activation='relu', kernel_initializer='he_uniform', kernel_regularizer=regularizers.l2(0.0001)),
         BatchNormalization(),
         Dropout(0.2),
