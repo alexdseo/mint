@@ -10,11 +10,12 @@ In this folder, we included samples of the Edamam dataset `edamam_ingredients_sa
 
 You can run [`create_embeddings.py`](https://github.com/alexdseo/mint/blob/main/data/create_embeddings.py) to create word embeddings of each menu item (averaged by all words) from the Edamam dataset, and also to create sentence embeddings using menu item names and its list of ingredients from the Edamam dataset. Before running this file, you have to get access to the [Recipe1M+](http://im2recipe.csail.mit.edu/) dataset, in order to train the FastText model. We specifically used the `layer1.json` dataset, which includes all of the texts for each menu item. 
 
+<!---
 ## Language Models
 
 - Model weights for **RecipeFT** can be downloaded [here](https://drive.google.com/drive/folders/16yGJUie7fu2ZdIwoRbHEGyQU4uLj9jlH)
 - **RecipeBERT** can be downloaded through our huggingface repository [here](https://huggingface.co/alexdseo/RecipeBERT)
-
+--->
 
 ## Dataset for the application
 
