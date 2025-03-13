@@ -15,8 +15,8 @@ def outlier_detection():
     num_menu = num_menu.reset_index(drop=True)
     num_menu = num_menu[['restaurant_ID', 'menu_ID']]
     num_menu = num_menu.rename(columns={'menu_ID': 'count'})
-    # <=5 and >=693 # 1% from each tails
-    ol_1p = num_menu[(num_menu['count'] <= 5) | (num_menu['count'] >= 693)]['restaurant_ID']
+    # <6 and >692 # 1% from each tails
+    ol_1p = num_menu[(num_menu['count'] < 6) | (num_menu['count'] > 692)]['restaurant_ID']
     # Export
     ol_1p.to_csv('ol_1p.csv',index=False)
 
