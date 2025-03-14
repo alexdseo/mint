@@ -1,7 +1,7 @@
 import pandas as pd
 from tqdm import tqdm
 
-def create_RND(ol_1p):
+def estimate_RND(ol_1p):
     # AMDD
     RND, RND_APP, RND_MAIN, RND_DSRT, RND_DRNK = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     # Large-scale dataset divided in 10 batches
@@ -59,4 +59,4 @@ def create_RND(ol_1p):
 
 if __name__ == "__main__":
     outliers = pd.read_csv('ol_1p.csv')
-    create_RND(outliers)
+    estimate_RND(outliers)
