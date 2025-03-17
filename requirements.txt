@@ -18,3 +18,4 @@ pyyaml==6.0
 transformers==4.26.0
 torch>=1.14.0
 openai==0.27.8
+census==0.8.20
