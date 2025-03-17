@@ -9,8 +9,8 @@ def estimate_RND(ol_1p):
         ol_1p: Outlier restaurant IDs to exclude
 
     Returns:
-        `RND_RRR.csv`: csv files with estimated Restaurant Nutrient Density (RND) score based on predicted Ratio of Recommended to Restricted nutrients (RRR) of menu item
-        `RND_RRR_{meal_type}.csv`: csv file with estimated RND considering the predicted meal type
+        `RND_RRR.csv`: csv file with estimated Restaurant Nutrient Density (RND) score based on predicted Ratio of Recommended to Restricted nutrients (RRR) of menu item
+        `RND_RRR_{meal_type}.csv`: csv files with estimated RND considering the predicted meal type
 
     """
     # AMDD
