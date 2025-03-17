@@ -7,7 +7,7 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 
 
 class food_category():
-    def __init__(self, data_path='../data/'):
+    def __init__(self, data_path='../data/files/'):
         # fixed hyperparameter
         self.cluster_size = 1000
         # hdbscan hyperparameter
@@ -17,9 +17,9 @@ class food_category():
         self.dim_check = [2, 10, 50]
         self.n_neigh_check = [10, 20, 50]
         # import the sentence embeddings to cluster
-        self.se_df = np.load(data_path + 'edamam_sentence_embeddings_mpnet.npy')
+        self.se_df = np.load(data_path + 'training_ingr_sentence_embeddings_mpnet.npy')
         # import nutrition dataset
-        self.nt_df = pd.read_csv(data_path + 'edamam_nutrition_sample.csv')
+        self.nt_df = pd.read_csv(data_path + 'generic_food_training_nutrition_sample.csv')
         # Use only nutritions
         self.nt_only_df = self.nt_df.iloc[:, 2:]
 

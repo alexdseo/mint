@@ -170,27 +170,27 @@ if __name__ == "__main__":
     # Retrieve embeddings
     recipeft_we = recipeft(training_menu)
     # Save the embeddings
-    np.save('training_menu_embedding.npy', recipeft_we)
+    np.save('./files/training_menu_embedding.npy', recipeft_we)
 
     # Get menu with ingredients # Embeddings for clustering
     training_name_ingr_txt = name_ingr(training_ingr)
     # Get sentence embeddings from pretrained mpnet
     ingr_setence_embeddings = get_setence_embeddings(training_name_ingr_txt)
     # Save the embeddings
-    np.save('training_ingr_sentence_embeddings_mpnet.npy', ingr_setence_embeddings)
+    np.save('./files/training_ingr_sentence_embeddings_mpnet.npy', ingr_setence_embeddings)
 
     # Read Inference dataset
-    inference_menu = pd.read_csv('restaurant_inference_nandes_sample.csv', low_memory=False, lineterminator='\n')
-    inference_desc = pd.read_csv('restaurant_inference_des_sample.csv', low_memory=False, lineterminator='\n')
+    inference_menu = pd.read_csv('./files/restaurant_inference_nandes_sample.csv', low_memory=False, lineterminator='\n')
+    inference_desc = pd.read_csv('./files/restaurant_inference_des_sample.csv', low_memory=False, lineterminator='\n')
 
     # Retrieve embeddings
     recipeft_we_inf = recipeft(inference_menu)
     # Save the embeddings
-    np.save('inference_menu_embedding.npy', recipeft_we_inf)
+    np.save('./files/inference_menu_embedding.npy', recipeft_we_inf)
 
     # Get name with description
     inference_name_desc_txt = name_des(inference_desc)
     # Get sentence embeddings from pretrained mpnet
     desc_sentence_embeddings = get_setence_embeddings(inference_name_desc_txt)
     # Save the embeddings
-    np.save('inference_des_sentence_embedding.npy', desc_sentence_embeddings)
+    np.save('./files/inference_des_sentence_embedding.npy', desc_sentence_embeddings)
