@@ -2,10 +2,21 @@ import pandas as pd
 from tqdm import tqdm
 
 def estimate_RND(ol_1p):
+    """
+    Estimate RND using predicted nutrient density score on each menu item from ~600k restaurants in the US
+
+    Args:
+        ol_1p: Outlier restaurant IDs to exclude
+
+    Returns:
+        `RND_RRR.csv`: csv files with estimated Restaurant Nutrient Density (RND) score based on predicted Ratio of Recommended to Restricted nutrients (RRR) of menu item
+        `RND_RRR_{meal_type}.csv`: csv file with estimated RND considering the predicted meal type
+
+    """
     # AMDD
     RND, RND_APP, RND_MAIN, RND_DSRT, RND_DRNK = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     # Large-scale dataset divided in 10 batches
-    for i in tqdm(range(1, 11)):
+    for i in tqdm(range(1, 11), desc='Estimating RND...'):
         inference_complete = pd.read_csv('inference_complete_' + str(i) + '.csv', low_memory=False, lineterminator='\n')
         # Discard detected outliers # 1pct from each tails
         ol_1p_index = inference_complete[inference_complete['restaurant_ID'].isin(ol_1p['restaurant_ID'])].index

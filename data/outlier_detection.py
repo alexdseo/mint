@@ -2,6 +2,12 @@ import pandas as pd
 from tqdm import tqdm
 
 def outlier_detection():
+    """
+    Perform outlier detection on large-scale real-world restaurant menu dataset
+
+    Returns:
+        `ol_1p.csv`: csv files with outlier restaurant ID with menu less than 6 itmes or more than 692 items.
+    """
     # Save number of menu per restaurant
     num_menu = pd.DataFrame()
     # Large-scale dataset divided in 10 batches
