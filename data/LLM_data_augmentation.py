@@ -200,7 +200,7 @@ if __name__ == "__main__":
     # Set seed
     np.random.seed(1996)
     # Read dataset
-    df = pd.read_csv('generic_food_training_nutrition_sample.csv')
+    df = pd.read_csv('./files/generic_food_training_nutrition_sample.csv')
     names = df['Name']
     generated_labels=generating_loop(ind_e=len(names), names=names, additional_check=False)
 
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
 
     # Read dataset # Use ingredients dataset for description generation
-    df_ingr = pd.read_csv('generic_food_training_ingredients_sample.csv')
+    df_ingr = pd.read_csv('./files/generic_food_training_ingredients_sample.csv')
     names = df_ingr['Name']
     generated_labels = generating_loop(ind_e=len(names), names=names, ingr=df_ingr['Ingredients_only'], gen_desc=True)
 

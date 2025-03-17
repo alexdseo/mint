@@ -154,8 +154,8 @@ if __name__ == "__main__":
     # Set seed
     np.random.seed(1996)
     # Read training dataset
-    training_menu = pd.read_csv('generic_food_training_nutrition_sample.csv')
-    training_ingr = pd.red_csv('generic_food_training_ingredients_sample.csv')
+    training_menu = pd.read_csv('./files/generic_food_training_nutrition_sample.csv')
+    training_ingr = pd.red_csv('./files/generic_food_training_ingredients_sample.csv')
 
     # Read Recipe 1M+ dataset # Access this data through their project website
     recipe1m = json.load(open('layer1.json'))
