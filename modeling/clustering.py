@@ -7,6 +7,15 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 
 
 class food_category():
+    """
+        Perform soft clustering on training dataset to create food category pseudo-label that will be used to train 
+        the food category prediction model. The food category pseudo-labels are subsequently used to partition
+        the data and predicted food category psuedo-label to be used to assign to each food category specific
+        nutrient density predicting expert model
+
+        Returns:
+            Training dataset in csv file with cluster labels acting as food category pseudo-label
+    """
     def __init__(self, data_path='../data/files/'):
         # fixed hyperparameter
         self.cluster_size = 1000
@@ -25,18 +34,18 @@ class food_category():
 
     def tuning(self):
         # Set seed
-        np.random.seed(2023)
+        np.random.seed(2025)
         for d in self.dim_check:
             for nb in self.n_neigh_check:
                 # Map embeddings using cosine distance
                 tune_umap = umap.UMAP(n_neighbors=nb, n_components=d, min_dist=0.0, metric='cosine',
-                                      random_state=2023).fit_transform(self.se_df)
+                                      random_state=2025).fit_transform(self.se_df)
                 # UMAP
                 df = pd.DataFrame(tune_umap)
                 for eps in self.ce_check:
                     for sam in self.min_sam_check:
                         # Set seed
-                        np.random.seed(2023)
+                        np.random.seed(2025)
                         # HDBSCAN # Clustering based on Euclidean distance
                         tune_umap_hdbscan = hdbscan.HDBSCAN(min_cluster_size=self.cluster_size, metric='l2',
                                                             cluster_selection_epsilon=eps, min_samples=sam,
@@ -66,9 +75,9 @@ class food_category():
                               'DB cluster mean score:', np.mean([db_emb, db_nut]))
                         # higher the better
                         # Score on embeddings
-                        si_emb = silhouette_score(self.se_df, df['sc'], sample_size=10000, random_state=2023)
+                        si_emb = silhouette_score(self.se_df, df['sc'], sample_size=10000, random_state=2025)
                         # Score on nutrition
-                        si_nut = silhouette_score(self.nt_only_df, df['sc'], sample_size=10000, random_state=2023)
+                        si_nut = silhouette_score(self.nt_only_df, df['sc'], sample_size=10000, random_state=2025)
                         print('Silhouette cluster score by embeddings:', si_emb, '\n',
                               'Silhouette  cluster score by nutrition:', si_nut, '\n',
                               'Silhouette  cluster mean score:', np.mean([si_emb, si_nut]))
@@ -78,11 +87,11 @@ class food_category():
         kf_1_tr, _, kf_2_tr, _, kf_3_tr, _, kf_4_tr, _, kf_5_tr, _ = set_fold(self.se_df)
         folds_tr_ind = [kf_1_tr, kf_2_tr, kf_3_tr, kf_4_tr, kf_5_tr]
         # Set seed
-        np.random.seed(2023)
+        np.random.seed(2025)
         for i, fold_ind in enumerate(folds_tr_ind):
             # UMAP
             embedding_umap = umap.UMAP(n_neighbors=15, n_components=2, min_dist=0.0, metric='cosine',
-                                       random_state=2023).fit_transform(self.se_df[fold_ind])
+                                       random_state=2025).fit_transform(self.se_df[fold_ind])
             # Get original dataset and add nutrient density score
             df = self.nt_df[fold_ind]
             df = nutrient_density_score(df)
