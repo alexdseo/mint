@@ -198,7 +198,7 @@ def generating_loop(ind_s=0, ind_e=0, names=[], ingr = [], additional_check=Fals
 
 if __name__ == "__main__":
     # Set seed
-    np.random.seed(1996)
+    np.random.seed(2025)
     # Read dataset
     df = pd.read_csv('./files/generic_food_training_nutrition_sample.csv')
     names = df['Name']
