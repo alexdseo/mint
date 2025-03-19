@@ -5,6 +5,7 @@ import fasttext
 from tqdm import tqdm
 import numpy as np
 import string
+from transformers import pipeline
 from sentence_transformers import SentenceTransformer
 
 
@@ -88,6 +89,23 @@ def recipeft(df):
     return ft_we
 
 
+def recipebert(df):
+    # Set seed
+    torch.manual_seed(2025)
+    food_name = list(df['Name'])
+    # pipeline
+    embedding = pipeline(
+        'feature-extraction', model='alexdseo/bert-base-uncased-finetuned-recipe1m-ALL', framework='pt'
+    )
+    # Get embeddings
+    ebd = list()
+    for i in tqdm(food_name):
+        ebd.append(embedding(i, return_tensors='pt')[0].numpy().mean(axis=0))
+    # Make it numpy arry
+    bert_we = np.array(ebd)
+
+    return bert_we
+
 def name_ingr(df):
     """
        Append food names and ingredients from the dataset
@@ -152,7 +170,7 @@ def get_setence_embeddings(txt):
 
 if __name__ == "__main__":
     # Set seed
-    np.random.seed(1996)
+    np.random.seed(2025)
     # Read training dataset
     training_menu = pd.read_csv('./files/generic_food_training_nutrition_sample.csv')
     training_ingr = pd.red_csv('./files/generic_food_training_ingredients_sample.csv')
@@ -167,10 +185,15 @@ if __name__ == "__main__":
 
     # Train fasttext model
     train_recipeft('train_nir_nopp.txt')
-    # Retrieve embeddings
+    # Retrieve RecipeFT embeddings
     recipeft_we = recipeft(training_menu)
-    # Save the embeddings
-    np.save('./files/training_menu_embedding.npy', recipeft_we)
+    # Save the RecipeFT embeddings
+    np.save('./files/training_menu_embedding_recipeft.npy', recipeft_we)
+
+    # Retrieve RecipeFT embeddings
+    recipebert_we = recipebert(training_menu)
+    # Save the RecipeFT embeddings
+    np.save('./files/training_menu_embedding_recipebert.npy', recipebert_we)
 
     # Get menu with ingredients # Embeddings for clustering
     training_name_ingr_txt = name_ingr(training_ingr)
@@ -183,9 +206,9 @@ if __name__ == "__main__":
     inference_menu = pd.read_csv('./files/restaurant_inference_nandes_sample.csv', low_memory=False, lineterminator='\n')
     inference_desc = pd.read_csv('./files/restaurant_inference_des_sample.csv', low_memory=False, lineterminator='\n')
 
-    # Retrieve embeddings
+    # Retrieve RecipeFT embeddings # Inference
     recipeft_we_inf = recipeft(inference_menu)
-    # Save the embeddings
+    # Save the RecipeFT embeddings # Inference
     np.save('./files/inference_menu_embedding.npy', recipeft_we_inf)
 
     # Get name with description
