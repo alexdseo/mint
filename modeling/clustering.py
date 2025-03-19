@@ -6,7 +6,7 @@ from modeling.utils import *
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 
 
-class food_category():
+class FoodCategorySoftClustering():
     """
         Perform soft clustering on training dataset to create food category pseudo-label that will be used to train 
         the food category prediction model. The food category pseudo-labels are subsequently used to partition
@@ -16,15 +16,24 @@ class food_category():
         Returns:
             Training dataset in csv file with cluster labels acting as food category pseudo-label
     """
-    def __init__(self, data_path='../data/files/'):
+    def __init__(self,
+                random_seed = 2025,
+                data_path = '../data/files/',
+                cluster_size = 1000,
+                hdbscan_min_sam = [10, 20, 50],
+                hdbscan_epsilon = [0, 0.05, 0.1],
+                umap_dim =[2, 10, 50],
+                umap_neigh = [10, 20, 50],
+        ):
+        self.random_seed = random_seed
         # fixed hyperparameter
-        self.cluster_size = 1000
+        self.cluster_size = cluster_size
         # hdbscan hyperparameter
-        self.min_sam_check = [10, 20, 50]
-        self.ce_check = [0, 0.05, 0.1]
+        self.min_sam_check = hdbscan_min_sam
+        self.ce_check = hdbscan_epsilon
         # umap hyperparameter
-        self.dim_check = [2, 10, 50]
-        self.n_neigh_check = [10, 20, 50]
+        self.dim_check = umap_dim
+        self.n_neigh_check = umap_neigh
         # import the sentence embeddings to cluster
         self.se_df = np.load(data_path + 'training_ingr_sentence_embeddings_mpnet.npy')
         # import nutrition dataset
@@ -33,19 +42,18 @@ class food_category():
         self.nt_only_df = self.nt_df.iloc[:, 2:]
 
     def tuning(self):
+        # Hyperparmeter tuning
         # Set seed
-        np.random.seed(2025)
+        np.random.seed(self.random_seed)
         for d in self.dim_check:
             for nb in self.n_neigh_check:
                 # Map embeddings using cosine distance
                 tune_umap = umap.UMAP(n_neighbors=nb, n_components=d, min_dist=0.0, metric='cosine',
-                                      random_state=2025).fit_transform(self.se_df)
+                                      random_state=self.random_seed).fit_transform(self.se_df)
                 # UMAP
                 df = pd.DataFrame(tune_umap)
                 for eps in self.ce_check:
                     for sam in self.min_sam_check:
-                        # Set seed
-                        np.random.seed(2025)
                         # HDBSCAN # Clustering based on Euclidean distance
                         tune_umap_hdbscan = hdbscan.HDBSCAN(min_cluster_size=self.cluster_size, metric='l2',
                                                             cluster_selection_epsilon=eps, min_samples=sam,
@@ -75,9 +83,9 @@ class food_category():
                               'DB cluster mean score:', np.mean([db_emb, db_nut]))
                         # higher the better
                         # Score on embeddings
-                        si_emb = silhouette_score(self.se_df, df['sc'], sample_size=10000, random_state=2025)
+                        si_emb = silhouette_score(self.se_df, df['sc'], sample_size=10000, random_state=self.random_seed)
                         # Score on nutrition
-                        si_nut = silhouette_score(self.nt_only_df, df['sc'], sample_size=10000, random_state=2025)
+                        si_nut = silhouette_score(self.nt_only_df, df['sc'], sample_size=10000, random_state=self.random_seed)
                         print('Silhouette cluster score by embeddings:', si_emb, '\n',
                               'Silhouette  cluster score by nutrition:', si_nut, '\n',
                               'Silhouette  cluster mean score:', np.mean([si_emb, si_nut]))
@@ -87,15 +95,15 @@ class food_category():
         kf_1_tr, _, kf_2_tr, _, kf_3_tr, _, kf_4_tr, _, kf_5_tr, _ = set_fold(self.se_df)
         folds_tr_ind = [kf_1_tr, kf_2_tr, kf_3_tr, kf_4_tr, kf_5_tr]
         # Set seed
-        np.random.seed(2025)
+        np.random.seed(self.random_seed)
         for i, fold_ind in enumerate(folds_tr_ind):
-            # UMAP
+            # UMAP # Chosen hyperparmeter
             embedding_umap = umap.UMAP(n_neighbors=15, n_components=2, min_dist=0.0, metric='cosine',
-                                       random_state=2025).fit_transform(self.se_df[fold_ind])
+                                       random_state=self.random_seed).fit_transform(self.se_df[fold_ind])
             # Get original dataset and add nutrient density score
             df = self.nt_df[fold_ind]
             df = nutrient_density_score(df)
-            # HDBSCAN
+            # HDBSCAN # Chosen hyperparmeter
             embedding_umap_hdbscan = hdbscan.HDBSCAN(min_cluster_size=1000, metric='l2', cluster_selection_epsilon=0.1,
                                                      min_samples=20, prediction_data=True).fit(embedding_umap)
             # Membership vector
@@ -105,12 +113,12 @@ class food_category():
             # Assign soft clusters
             df['sc'] = sc
             # Export it to csv
-            df.to_csv('target_kf' + str(i + 1) + '.csv', encoding='utf-8', index=False)
+            df.to_csv(f"target_kf{i + 1}.csv", encoding='utf-8', index=False)
 
 
 if __name__ == "__main__":
-    create_food_category = food_category()
-    # Try different hyperparameter for clustering
-    # food_category.tuning()
+    create_food_category = FoodCategorySoftClustering()
+    # Tuning hyperparameter for clustering
+    # create_food_category.tuning()
     # Get food category by clustering the sentence embedding # Export the csv file for all folds
-    food_category.clustering()
+    create_food_category.clustering()
