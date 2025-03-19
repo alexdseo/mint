@@ -190,9 +190,9 @@ if __name__ == "__main__":
     # Save the RecipeFT embeddings
     np.save('./files/training_menu_embedding_recipeft.npy', recipeft_we)
 
-    # Retrieve RecipeFT embeddings
+    # Retrieve RecipeBERT embeddings
     recipebert_we = recipebert(training_menu)
-    # Save the RecipeFT embeddings
+    # Save the RecipeBERT embeddings
     np.save('./files/training_menu_embedding_recipebert.npy', recipebert_we)
 
     # Get menu with ingredients # Embeddings for clustering
@@ -203,7 +203,9 @@ if __name__ == "__main__":
     np.save('./files/training_ingr_sentence_embeddings_mpnet.npy', ingr_setence_embeddings)
 
     # Read Inference dataset
+    # Menus without description
     inference_menu = pd.read_csv('./files/restaurant_inference_nandes_sample.csv', low_memory=False, lineterminator='\n')
+    # Menus with descriptions
     inference_desc = pd.read_csv('./files/restaurant_inference_des_sample.csv', low_memory=False, lineterminator='\n')
 
     # Retrieve RecipeFT embeddings # Inference
