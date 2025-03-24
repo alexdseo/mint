@@ -79,7 +79,6 @@ class NutrientDensityPredModel(nn.Module):
         x = self.fc4(x)
 
         return x
-    
 
 
 class DataProcessor:
@@ -553,7 +552,6 @@ if __name__ == "__main__":
     y_test = y[test_ind]
     # Assign true nutrition density score
     y_test = nutrient_density_score(y_test)
-
 
     mint = Pipeline(device=gpu)
     # Run baseline method and get the predicted food category for the test dataset
