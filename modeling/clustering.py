@@ -4,6 +4,7 @@ import hdbscan
 import umap
 from modeling.utils import *
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
+import sys
 
 
 class FoodCategorySoftClustering():
@@ -113,12 +114,16 @@ class FoodCategorySoftClustering():
             # Assign soft clusters
             df['sc'] = sc
             # Export it to csv
-            df.to_csv(f"target_kf{i + 1}.csv", encoding='utf-8', index=False)
+            df.to_csv(f"training_kf{i + 1}.csv", encoding='utf-8', index=False)
 
 
 if __name__ == "__main__":
+    # Get arguments
+    tuning = sys.argv[1]  # Perform hyperparmeter for tuning or not # boolean (True or False)
+    # Clustering
     create_food_category = FoodCategorySoftClustering()
     # Tuning hyperparameter for clustering
-    # create_food_category.tuning()
+    if tuning:
+        create_food_category.tuning()
     # Get food category by clustering the sentence embedding # Export the csv file for all folds
     create_food_category.clustering()
