@@ -35,6 +35,7 @@ def timeout(seconds=5, default=None):
 
     return decorator
 
+
 @retry(
     retry=retry_if_exception_type((openai.error.APIError, openai.error.APIConnectionError, openai.error.RateLimitError, openai.error.ServiceUnavailableError, openai.error.Timeout)),
     wait=wait_random_exponential(multiplier=1, min=4, max=20)
@@ -62,6 +63,7 @@ def AMDD_cls(name):
     )
 
     return completion.choices[0].message.content
+
 
 @retry(
     retry=retry_if_exception_type((openai.error.APIError, openai.error.APIConnectionError, openai.error.RateLimitError, openai.error.ServiceUnavailableError, openai.error.Timeout)),
@@ -147,7 +149,6 @@ def generate_description(name, ingredients):
     return completion.choices[0].message.content#, completion.usage.completion_tokens # Number of output tokens per descriptions
 
 
-
 def generating_loop(ind_s=0, ind_e=0, names=[], ingr = [], additional_check=False, gen_desc=False):
     """
     Generates labels based on the provided `names` list using either `sauce_cls` or `AMDD_cls`.
@@ -195,14 +196,13 @@ def generating_loop(ind_s=0, ind_e=0, names=[], ingr = [], additional_check=Fals
     return gen_lst
 
 
-
 if __name__ == "__main__":
     # Set seed
     np.random.seed(2025)
     # Read dataset
     df = pd.read_csv('./files/generic_food_training_nutrition_sample.csv')
     names = df['Name']
-    generated_labels=generating_loop(ind_e=len(names), names=names, additional_check=False)
+    generated_labels = generating_loop(ind_e=len(names), names=names, additional_check=False)
 
     # Export via pickle
     with open('AMDD_cls_result', 'wb') as fp:
