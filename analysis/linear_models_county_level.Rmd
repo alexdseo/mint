@@ -1,0 +1,222 @@
+---
+title: "linear_models_county_level"
+author: "alexdseo"
+date: "03/25/2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = NA,
+                      tidy = TRUE, tidy.opts = list(width.cutoff = 60),
+                      warning = FALSE, message = FALSE)
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(car)
+library(pastecs)
+library(lares)
+library(sjPlot)
+theme_set(theme_sjplot())
+library(broom)
+```
+
+## Read dataset w/ thresholding
+
+```{r}
+# Read dataset with all features
+df_all <- read.csv("county_FEND.csv")
+# Thresholding
+get_percentile <- function(p, df) {
+  # Compute the percentile
+  threshold <- round(quantile(df[, c("restaurant_count")], probs = p / 100))
+  return(threshold)
+}
+# 50% thresholding (>15): main result 
+# All (>0), 30% (>3), and 70% (>80) for sensitivity analysis
+df <- filter(df_all, restaurant_count >= get_percentile(50, df_all))
+```
+
+```{r}
+vars <- c("OBESITY_AdjPrev", "DIABETES_AdjPrev", "CHD_AdjPrev",
+         "FEND", "RND_STDEV", "pp_lowAccess", "lsr_density", "mrfei",
+         "pp_black", "pp_white", "pp_asian", "pp_hispanic", "median_age",
+         "median_income", "employment_rate", "gini_index", "pp_publicTP",
+         "pp_longcomute", "pp_lowskillJob", "pp_collegeEd", "log_total_pop")
+# Normalize
+df <- as.data.frame(scale(df[, vars]))
+```
+
+## Linear Models
+
+```{r}
+# VIF analysis
+vif_analysis <- function(model) {
+  vif_values <- data.frame(vif(model))
+  vif_values <- cbind(variables = rownames(vif_values), vif_values)
+  rownames(vif_values) <- 1:nrow(vif_values)
+  names(vif_values)[2] <- "vif_value"
+  # Plot VIF values
+  ggplot(data = vif_values, aes(x = variables, y = vif_value)) +
+    geom_bar(stat = "identity", width = 0.5) +
+    theme(axis.text.x = element_text(size = rel(0.9), angle = 45))
+}
+# Initial model for VIF analysis: FEND ~ All SES factors
+fend_ses <- lm(FEND ~ pp_white + pp_black + pp_asian + pp_hispanic +
+                 median_age + median_income + employment_rate + gini_index +
+                 pp_publicTP + pp_longcomute + pp_lowskillJob + pp_collegeEd +
+                 log_total_pop, data = df)
+# VIF analysis
+vif_analysis(fend_ses)
+```
+
+```{r}
+# Function to rename columns # For visualization
+rename_columns <- function(data) {
+  rename_list <- c(
+    "pp_black" = "%Black",
+    "pp_asian" = "%Asian",
+    "pp_white" = "%White",
+    "pp_hispanic" = "%Hispanic",
+    "median_age " = "Median Age",
+    "median_income" = "Median Income",
+    "employment_rate" = "Employment Rate",
+    "gini_index" = "Gini Index",
+    "pp_publicTP" = "%PublicTransportation",
+    "pp_longcomute" = "%LongComute",
+    "pp_lowskillJob" = "%LowSkillJob",
+    "pp_collegeEd" = "%CollegeEdu",
+    "log_total_pop" = "Total Population(log-scaled)"
+  )
+  # Keep the original name if not in the rename list
+  names(data) <- ifelse(names(data) %in% names(rename_list),
+                        rename_list[names(data)], names(data))
+  return(data)
+}
+# Predicting Food Environment (FE) metrics with SES factors
+linear_analysis <- function(formula, data) {
+  data <- rename_columns(data)
+  model <- lm(formula, data = data)
+  print(summary(model))
+  # Extract coefficients, p-values, and estimate signs
+  model_tidy <- tidy(model)
+  model_tidy$sign <- ifelse(model_tidy$estimate > 0, "positive", "negative")
+  # Create a color vector based on p-values and estimate signs
+  color_vector <- ifelse(model_tidy$p.value < 0.05 & model_tidy$sign == "positive", "blue",
+                         ifelse(model_tidy$p.value < 0.05 & model_tidy$sign == "negative", "red", "grey"))
+  # Plot model results
+  print(
+    plot_model(model, sort.est = FALSE, vline.color = "black", show.values = FALSE,
+                value.offset = .45, value.size = 3.25, dot.size = 3, line.size = 1,
+                width = .5, group.terms  = color_vector[2:length(color_vector)],
+                colors = c("#0047AB", "grey", "#f01e2c"),
+                title = "") +
+        theme(text = element_text(family = "Arial", size = 22.5, color = "black"),
+            plot.title = element_text(size = 5),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank())
+  )
+  return(model)
+}
+# Remove "%White"(pp_white) based on the VIF analysis above
+# Perform analysis with other FE metrics as well
+fe_metrics <- c("FEND", "RND_STDEV", "pp_lowAccess", "lsr_density", "mrfei")
+# Models list
+fe_models <- list()
+for (metric in fe_metrics) {
+    formula <- as.formula(paste(metric, "~ `%Black` + `%Asian` + `%Hispanic` +
+                              `Median Age` + `Median Income` + `Employment Rate` + 
+                              `Gini Index` + `%PublicTransportation` + `%LongComute` + 
+                              `%LowSkillJob` + `%CollegeEdu` + `Total Population(log-scaled)`"))
+    fe_models[[metric]] <- linear_analysis(formula, data = df)
+}
+
+```
+
+```{r}
+# Unadjusted model 
+# Predicting diet-related diseases prevalence using food environment metrics
+drd_vars <- c("OBESITY_AdjPrev", "DIABETES_AdjPrev", "CHD_AdjPrev",)
+drd_uadj_models <- list()
+# 15 models: 3 diet-related diseases & 5 FE metrics
+for (var in drd_vars) {
+    for (metric in fe_metrics) {
+        formula <- as.formula(paste(var, "~", metric))
+        model_name <- paste0(var, "-", metric)
+        drd_uadj_models[[model_name]] <- lm(formula, data = df)
+        # Print model summary and confidence intervals
+        cat("-----\n")
+        print(formula)
+        print(summary(drd_uadj_models[[model_name]]))
+        print(confint(drd_uadj_models[[model_name]]))
+        cat("-----\n")
+        # Plot
+        print(
+          ggplot(df, aes(x = .data[[metric]], y = .data[[var]])) +
+              geom_point(alpha = 0.1, shape = 18) +
+              geom_vline(xintercept = mean(df[[metric]], na.rm = TRUE),
+                         color = "red",
+                         linetype = "dashed") +
+              geom_hline(yintercept = mean(df[[var]], na.rm = TRUE),
+                         color = "red",
+                         linetype = "dashed") + 
+              geom_smooth(method = "lm", se = TRUE) +
+              labs(x = metric, y = var, title = "") +
+              theme_classic() +
+              theme(plot.title = element_text(size = 13),
+                    axis.title = element_text(size = 10),
+                    legend.title = element_text(size = 10))
+        )
+    }
+}
+```
+
+```{r}
+# Additional diagnostics plots for unadjusted models
+run_diagnostics <- FALSE # Change to TRUE to run the diagnostics
+# Run diagnostics
+if (run_diagnostics) {
+    for (model_name in names(drd_uadj_models)) {
+        uadj_model <- drd_uadj_models[[model_name]]
+        # Standardized Residual Plot
+        plot(predict(uadj_model), rstandard(uadj_model),
+             pch = 23, bg = "red", cex = 1.2,
+             xlab = "Predicted Values",
+             ylab = "Standardized Residuals",
+             main = paste("Standardized Residual Plot: ", model_name))
+        abline(a = 0, b = 0, col = "black", lwd = 3)
+        # QQ-Norm Plot
+        qqnorm(rstandard(uadj_model), pch = 23, bg = "red", cex = 1.2,
+               main = paste("QQ Plot: ", model_name))
+        qqline(rstandard(uadj_model), col = "black", lwd = 3)
+        # Cook's Distance Plot
+        cooki <- cooks.distance(uadj_model)
+        plot(seq_along(cooki), cooki, type = "p", pch = 23, bg = "red", cex = 1.2,
+             xlab = "Index (Each Observation)", 
+             ylab = "Cook's Distance", 
+             main = paste("Influence Values (Cook's Distance): ", model_name))
+    }
+}
+```
+
+```{r}
+options(scipen = 999)
+# Adjusted model with SES covariates
+drd_adj_models <- list()
+# 15 models: 3 diet-related diseases & 5 FE metrics
+for (var in drd_vars) {
+    for (metric in fe_metrics) {
+        formula <- as.formula(paste(var, "~", metric, "+ pp_black + pp_asian + pp_hispanic + median_age +
+                                             median_income + employment_rate + gini_index + pp_publicTP +
+                                             pp_longcomute + pp_lowskillJob + pp_collegeEd + log_total_pop"))
+        model_name <- paste0(var, "-", metric)
+        drd_adj_models[[model_name]] <- lm(formula, data = df)
+        # Print model summary and confidence intervals
+        cat("-----\n")
+        print(paste("Adjusted model:", var, "~", metric))
+        print(summary(drd_adj_models[[model_name]]))
+        print(round(confint(drd_adj_models[[model_name]]), 2))
+        cat("-----\n")
+    }
+}
+```
