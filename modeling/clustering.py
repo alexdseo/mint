@@ -7,7 +7,7 @@ from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bo
 import sys
 
 
-class FoodCategorySoftClustering():
+class FoodCategorySoftClustering:
     """
         Perform soft clustering on training dataset to create food category pseudo-label that will be used to train 
         the food category prediction model. The food category pseudo-labels are subsequently used to partition
