@@ -3,6 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import geopandas as gpd
 from census import Census
+import sys
 
 CENSUS_API_KEY = ''
 
@@ -49,7 +50,7 @@ def locate_df(RND_df, gpd_df):
     return RND_df_located
 
 
-def estimate_FEND(RND_df, meal_type, county_ho):
+def estimate_FEND(RND_df, meal_type, county_ho, nds):
     """
     Estimate Food Enivronemnt Nutrient Density (FEND) on county-level using estimated RND score on ~600k restaurants in the US
 
@@ -57,22 +58,23 @@ def estimate_FEND(RND_df, meal_type, county_ho):
         RND_df: df with RND score
         meal_type: Meal type of appetizers, main dish, dessert, drink
         county_ho: county level health outcome data to merge with
+        nds: nutrient density score
 
     Returns:
         FEND_df: df with FEND score
     """
     # FEND type
     metric = {
-        'APP': 'RND_RRR_APP',
-        'MAIN': 'RND_RRR_MAIN',
-        'DSRT': 'RND_RRR_DSRT',
-        'DRNK': 'RND_RRR_DRNK'
-    }.get(meal_type, 'RND_RRR')
+        'APP': f"RND_{nds}_APP",
+        'MAIN': f"RND_{nds}_MAIN",
+        'DSRT': f"RND_{nds}_DSRT",
+        'DRNK': f"RND_{nds}_DRNK"
+    }.get(meal_type, f"RND_{nds}")
     # FEND
     FEND_df = RND_df.groupby(['CountyFIPS']).median(numeric_only=True)[[metric,'lower_ci','upper_ci',
                                                                           'location_latitude','location_longitude']]
     FEND_df['CountyFIPS'] = FEND_df.index
-    FEND_df = FEND_df.rename(columns={'RND_RRR':'FEND_RRR'}).reset_index(drop=True)
+    FEND_df = FEND_df.rename(columns={f"RND_{nds}":f"FEND_{nds}"}).reset_index(drop=True)
     # RND STDEV
     RND_stdev = RND_df.groupby(['CountyFIPS']).std(numeric_only=True)[[metric]]
     RND_stdev['CountyFIPS'] = RND_stdev.index
@@ -382,24 +384,26 @@ def merge_traditional_indicators(FEND_df, mrfei_df, lsr_df, lsr_df2, usda_df):
 
 
 if __name__ == "__main__":
+    # Get arguments for score
+    nds = sys.argv[1]  # nutrition desnsity score # ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA
     # CDC PLACES Community Health Outcomes # County-level # 2020 release
     county_ho = pd.read_csv('PLACES__County_Data__GIS_Friendly_Format___2020_release.csv', dtype={'CountyFIPS':str}) 
     # County boundaries
     county_boundary = gpd.read_file('./cb_2015_us_county_500k/cb_2015_us_county_500k.shp')
     county_df = county_data(county_ho, county_boundary)
     # Read RND data
-    RND = pd.read_csv('RND_RRR.csv')
-    RND_APP = pd.read_csv('RND_RRR_APP.csv')
-    RND_MAIN = pd.read_csv('RND_RRR_MAIN.csv')
-    RND_DSRT = pd.read_csv('RND_RRR_DSRT.csv')
-    RND_DRNK = pd.read_csv('RND_RRR_DRNK.csv')
+    RND = pd.read_csv(f"RND_{nds}.csv")
+    RND_APP = pd.read_csv(f"RND_{nds}_APP.csv")
+    RND_MAIN = pd.read_csv(f"RND_{nds}_MAIN.csv")
+    RND_DSRT = pd.read_csv(f"RND_{nds}_DSRT.csv")
+    RND_DRNK = pd.read_csv(f"RND_{nds}_DRNK.csv")
     # Locate df by joining the environment df with RND df
     RND, RND_APP, RND_MAIN, RND_DSRT, RND_DRNK = locate_df(RND, county_df), locate_df(RND_APP, county_df),\
           locate_df(RND_MAIN, county_df), locate_df(RND_DSRT, county_df), locate_df(RND_DRNK, county_df)
     # Estimate FEND
-    FEND, FEND_APP, FEND_MAIN, FEND_DSRT, FEND_DRNK = estimate_FEND(RND, 'ALL', county_df),\
-        estimate_FEND(RND_APP, 'APP', county_df), estimate_FEND(RND_MAIN, 'MAIN', county_df),\
-        estimate_FEND(RND_DSRT, 'DSRT', county_df), estimate_FEND(RND_DRNK, 'DRNK', county_df)
+    FEND, FEND_APP, FEND_MAIN, FEND_DSRT, FEND_DRNK = estimate_FEND(RND, 'ALL', county_df, nds=nds),\
+        estimate_FEND(RND_APP, 'APP', county_df, nds=nds), estimate_FEND(RND_MAIN, 'MAIN', county_df, nds=nds),\
+        estimate_FEND(RND_DSRT, 'DSRT', county_df, nds=nds), estimate_FEND(RND_DRNK, 'DRNK', county_df, nds=nds)
     
     # Get state codes
     state_code = county_df[['StateAbbr', 'STATEFP']].drop_duplicates().values.tolist()
@@ -415,8 +419,8 @@ if __name__ == "__main__":
     FEND = merge_traditional_indicators(FEND, mrfei, lsr_2020, lsr_2021, food_access)
     
     # Export FEND data as csv
-    FEND.to_csv('FEND_RRR.csv', index=False)
-    FEND_APP.to_csv('FEND_RRR_APP.csv', index=False)
-    FEND_MAIN.to_csv('FEND_RRR_MAIN.csv', index=False)
-    FEND_DSRT.to_csv('FEND_RRR_DSRT.csv', index=False)
-    FEND_DRNK.to_csv('FEND_RRR_DRNK.csv', index=False)
+    FEND.to_csv(f"FEND_{nds}.csv", index=False)
+    FEND_APP.to_csv(f"FEND_{nds}_APP.csv", index=False)
+    FEND_MAIN.to_csv(f"FEND_{nds}_MAIN.csv", index=False)
+    FEND_DSRT.to_csv(f"FEND_{nds}_DSRT.csv", index=False)
+    FEND_DRNK.to_csv(f"FEND_{nds}_DRNK.csv", index=False)

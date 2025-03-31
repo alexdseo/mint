@@ -204,13 +204,13 @@ if __name__ == "__main__":
     names = df['Name']
     generated_labels = generating_loop(ind_e=len(names), names=names, additional_check=False)
 
-    # Export via pickle
+    # Export via pickle # First roudn of AMDD including hallucinations # Need human validation
     with open('AMDD_cls_result', 'wb') as fp:
         pickle.dump(generated_labels, fp)
 
 
     # Read dataset # Use dataset that was human-validated for hallucinations for additional classification
-    df_hlc = pd.read_csv('AMDD_labels_hlc_result.csv') # Hallucinated results
+    df_hlc = pd.read_csv('AMDD_labels_hlc_result.csv') # Hallucinated results # Additional check for sauces and etc.
     names = df_hlc['Name']
     generated_labels = generating_loop(ind_e=len(names), names=names, additional_check=True)
 
