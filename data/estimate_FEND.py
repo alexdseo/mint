@@ -389,14 +389,14 @@ if __name__ == "__main__":
     # CDC PLACES Community Health Outcomes # County-level # 2020 release
     county_ho = pd.read_csv('PLACES__County_Data__GIS_Friendly_Format___2020_release.csv', dtype={'CountyFIPS':str}) 
     # County boundaries
-    county_boundary = gpd.read_file('./cb_2015_us_county_500k/cb_2015_us_county_500k.shp')
+    county_boundary = gpd.read_file('./files/cb_2015_us_county_500k/cb_2015_us_county_500k.shp')
     county_df = county_data(county_ho, county_boundary)
     # Read RND data
-    RND = pd.read_csv(f"RND_{nds}.csv")
-    RND_APP = pd.read_csv(f"RND_{nds}_APP.csv")
-    RND_MAIN = pd.read_csv(f"RND_{nds}_MAIN.csv")
-    RND_DSRT = pd.read_csv(f"RND_{nds}_DSRT.csv")
-    RND_DRNK = pd.read_csv(f"RND_{nds}_DRNK.csv")
+    RND = pd.read_csv(f"./files/RND_{nds}.csv")
+    RND_APP = pd.read_csv(f"./files/RND_{nds}_APP.csv")
+    RND_MAIN = pd.read_csv(f"./files/RND_{nds}_MAIN.csv")
+    RND_DSRT = pd.read_csv(f"./files/RND_{nds}_DSRT.csv")
+    RND_DRNK = pd.read_csv(f"./files/RND_{nds}_DRNK.csv")
     # Locate df by joining the environment df with RND df
     RND, RND_APP, RND_MAIN, RND_DSRT, RND_DRNK = locate_df(RND, county_df), locate_df(RND_APP, county_df),\
           locate_df(RND_MAIN, county_df), locate_df(RND_DSRT, county_df), locate_df(RND_DRNK, county_df)
@@ -419,8 +419,8 @@ if __name__ == "__main__":
     FEND = merge_traditional_indicators(FEND, mrfei, lsr_2020, lsr_2021, food_access)
     
     # Export FEND data as csv
-    FEND.to_csv(f"FEND_{nds}.csv", index=False)
-    FEND_APP.to_csv(f"FEND_{nds}_APP.csv", index=False)
-    FEND_MAIN.to_csv(f"FEND_{nds}_MAIN.csv", index=False)
-    FEND_DSRT.to_csv(f"FEND_{nds}_DSRT.csv", index=False)
-    FEND_DRNK.to_csv(f"FEND_{nds}_DRNK.csv", index=False)
+    FEND.to_csv(f"./files/FEND_{nds}.csv", index=False)
+    FEND_APP.to_csv(f"./files/FEND_{nds}_APP.csv", index=False)
+    FEND_MAIN.to_csv(f"./files/FEND_{nds}_MAIN.csv", index=False)
+    FEND_DSRT.to_csv(f"./files/FEND_{nds}_DSRT.csv", index=False)
+    FEND_DRNK.to_csv(f"./files/FEND_{nds}_DRNK.csv", index=False)

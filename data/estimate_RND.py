@@ -64,11 +64,11 @@ def estimate_RND(ol_1p, nds):
         RND_DRNK_batch = RND_DRNK_batch.rename(columns={f"Predicted_{nds}": f"RND_{nds}_DRNK"}).reset_index(drop=True)
         RND_DRNK = pd.concat([RND_DRNK, RND_DRNK_batch])
     # Export
-    RND.to_csv(f"RND_{nds}.csv", index=False)
-    RND_APP.to_csv(f"RND_{nds}_APP.csv", index=False)
-    RND_MAIN.to_csv(f"RND_{nds}_MAIN.csv", index=False)
-    RND_DSRT.to_csv(f"RND_{nds}_DSRT.csv", index=False)
-    RND_DRNK.to_csv(f"RND_{nds}_DRNK.csv", index=False)
+    RND.to_csv(f"./files/RND_{nds}.csv", index=False)
+    RND_APP.to_csv(f"./files/RND_{nds}_APP.csv", index=False)
+    RND_MAIN.to_csv(f"./files/RND_{nds}_MAIN.csv", index=False)
+    RND_DSRT.to_csv(f"./files/RND_{nds}_DSRT.csv", index=False)
+    RND_DRNK.to_csv(f"./files/RND_{nds}_DRNK.csv", index=False)
 
 if __name__ == "__main__":
     # Get arguments for score
