@@ -24,8 +24,10 @@ library(broom)
 ## Read dataset w/ thresholding
 
 ```{r}
-# Read dataset with all features
-df_all <- read.csv("county_FEND.csv")
+# Nutrient Density Score to analyze # RRR, NRF9.3, NRF6.3, LIM, WHO, FSA
+nds <- "RRR"
+# Read dataset with all features # County level
+df_all <- read.csv(paste0("FEND_", nds, ".csv"))
 # Thresholding
 get_percentile <- function(p, df) {
   # Compute the percentile
@@ -39,10 +41,10 @@ df <- filter(df_all, restaurant_count >= get_percentile(50, df_all))
 
 ```{r}
 vars <- c("OBESITY_AdjPrev", "DIABETES_AdjPrev", "CHD_AdjPrev",
-         "FEND", "RND_STDEV", "pp_lowAccess", "lsr_density", "mrfei",
-         "pp_black", "pp_white", "pp_asian", "pp_hispanic", "median_age",
-         "median_income", "employment_rate", "gini_index", "pp_publicTP",
-         "pp_longcomute", "pp_lowskillJob", "pp_collegeEd", "log_total_pop")
+          "FEND", "RND_STDEV", "pp_lowAccess", "lsr_density", "mrfei",
+          "pp_black", "pp_white", "pp_asian", "pp_hispanic", "median_age",
+          "median_income", "employment_rate", "gini_index", "pp_publicTP",
+          "pp_longcomute", "pp_lowskillJob", "pp_collegeEd", "log_total_pop")
 # Normalize
 df <- as.data.frame(scale(df[, vars]))
 ```
