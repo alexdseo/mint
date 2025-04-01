@@ -74,7 +74,7 @@ def estimate_FEND(RND_df, meal_type, county_ho, nds):
     FEND_df = RND_df.groupby(['CountyFIPS']).median(numeric_only=True)[[metric,'lower_ci','upper_ci',
                                                                           'location_latitude','location_longitude']]
     FEND_df['CountyFIPS'] = FEND_df.index
-    FEND_df = FEND_df.rename(columns={f"RND_{nds}":f"FEND_{nds}"}).reset_index(drop=True)
+    FEND_df = FEND_df.rename(columns={metric:"FEND"}).reset_index(drop=True)
     # RND STDEV
     RND_stdev = RND_df.groupby(['CountyFIPS']).std(numeric_only=True)[[metric]]
     RND_stdev['CountyFIPS'] = RND_stdev.index
