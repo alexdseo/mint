@@ -43,7 +43,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-MINT uses data from multiple sources, including high-quality generic food items, large-scale recipe datasets, LLM-generated synthetic data labels, and real-world restaurant menu items in the United States. For more details on producing embeddings, generating labels, post-processing, and creating metrics using these datasets, please see [`data`](https://github.com/alexdseo/mint/blob/main/data).
+MINT uses data from multiple sources, including high-quality generic food items, large-scale recipe datasets, LLM-generated synthetic data labels, and real-world restaurant menu items in the United States. For more details on producing embeddings, generating labels, post-processing, and creating metrics using these datasets, please see [`data`](https://github.com/alexdseo/mint/tree/main/data).
 
 MINT consists of two modeling components, clustering and food category-specific predictions. After initial clustering, we provide two options to train MINT using different deep learning frameworks, TensorFlow and PyTorch. For more details, please see [`modeling`](https://github.com/alexdseo/mint/tree/main/modeling).
 
