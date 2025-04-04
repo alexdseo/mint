@@ -1,0 +1,7 @@
+Model,Health outcomes,FEND,FEND (95% CI),is_significant (FEND),USDA %Low Access,USDA %Low Access (95% CI),is_significant (USDA %Low Access),LSR Density,LSR Density (95% CI),is_significant (LSR Density),CDC mRFEI,CDC mRFEI (95% CI),is_significant (CDC mRFEI)
+UnAdj,Obesity,-0.53,"(-0.58, -0.48)",True,0.22,"(0.17, 0.28)",True,-0.09,"(-0.15, -0.04)",True,-0.14,"(-0.2, -0.09)",True
+UnAdj,Diabetes,-0.31,"(-0.36, -0.25)",True,0.02,"(-0.03, 0.08)",False,0.04,"(-0.02, 0.1)",False,-0.17,"(-0.22, -0.11)",True
+UnAdj,CHD,-0.47,"(-0.52, -0.42)",True,0.3,"(0.25, 0.36)",True,-0.09,"(-0.14, -0.03)",True,-0.1,"(-0.16, -0.05)",True
+Adj,Obesity,-0.11,"(-0.15, -0.06)",True,-0.01,"(-0.06, 0.03)",False,0.04,"(0.0, 0.08)",True,-0.04,"(-0.08, -0.01)",True
+Adj,Diabetes,-0.08,"(-0.11, -0.05)",True,0.03,"(0.0, 0.07)",True,0.04,"(0.01, 0.06)",True,-0.02,"(-0.05, 0.0)",False
+Adj,CHD,-0.09,"(-0.13, -0.06)",True,0.05,"(0.01, 0.08)",True,0.02,"(-0.01, 0.05)",False,-0.02,"(-0.04, 0.01)",False
