@@ -1,10 +1,14 @@
 <p align="center">
-  <img src="https://github.com/alexdseo/mint/blob/main/figures/mint_logo.png" />
+  <img src="https://github.com/alexdseo/mint/blob/main/figures/mint_logo.png"/>
 </p>
+
+<h2 align="center">
+  Menu Item to NutrienT
+</h2>
 
 --- 
 
-MINT: Menu Item to NutrienT is an open-source machine learning pipeline that predicts the nutritional density of a menu item through their names. MINT includes building a food-specific language model and generating ingredient-contextualized cluster labels to enhance the prediction performance. MINT employs a multi-expert system enabling specialized prediction for distinct food categories. The goal of the MINT is to predict the nutrient density, which serves as a basis for defining restaurant-level metrics, Restaurant Nutrient Density (*RND*), an aggregated nutrient density of all menu items offered by the restaurant. Extending this evaluation to the broader context of the food environment, we create metrics at the food environment level, Food Environment Nutrient Density (*FEND*), to evaluate the healthy food accessibility in the area.
+MINT:  is an open-source machine learning pipeline that predicts the nutritional density of a menu item through their names. MINT includes building a food-specific language model and generating ingredient-contextualized cluster labels to enhance the prediction performance. MINT employs a multi-expert system enabling specialized prediction for distinct food categories. The goal of the MINT is to predict the nutrient density, which serves as a basis for defining restaurant-level metrics, Restaurant Nutrient Density (*RND*), an aggregated nutrient density of all menu items offered by the restaurant. Extending this evaluation to the broader context of the food environment, we create metrics at the food environment level, Food Environment Nutrient Density (*FEND*), to evaluate the healthy food accessibility in the area.
 
 
 ## Mapping Nutritional Health through U.S. Restaurant Menus
