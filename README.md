@@ -1,6 +1,6 @@
 # MINT
 
-MINT: Menu Item to NutrienT is an open source machine learning pipeline that predicts the nutritional density of a menu item through their names. MINT includes building a food-specific language model and generating ingredient-contextualized cluster labels to enhance the prediction performance. MINT employs multi-expert system enabling specialized prediction for distinct food categories. The goal of the MINT is to predict the nutrient density, which serves as a basis for defining restaurant-level metrics, Restaurant Nutrient Density (*RND*), an aggregated nutrient density of all menu items offered by the restaurant. Extending this evaluation to the broader context of the food environment, we create metrics at the food environment level, Food Envrionemnt Nutrient Density (*FEND*) to evaluate the healthy food accessibility in the area.
+MINT: Menu Item to NutrienT is an open-source machine learning pipeline that predicts the nutritional density of a menu item through their names. MINT includes building a food-specific language model and generating ingredient-contextualized cluster labels to enhance the prediction performance. MINT employs a multi-expert system enabling specialized prediction for distinct food categories. The goal of the MINT is to predict the nutrient density, which serves as a basis for defining restaurant-level metrics, Restaurant Nutrient Density (*RND*), an aggregated nutrient density of all menu items offered by the restaurant. Extending this evaluation to the broader context of the food environment, we create metrics at the food environment level, Food Environment Nutrient Density (*FEND*), to evaluate the healthy food accessibility in the area.
 
 
 ## Mapping Nutritional Health through U.S. Restaurant Menus
@@ -41,11 +41,11 @@ pip install -r requirements.txt
 
 ## Usage
 
-MINT uses data from multiple sources, from high-quality generic food item, large-scale recipe dataset, LLM-generated synthetic data labels, and real-world restaurant menu items in the United States. For more details on producing embeddings, generating lables, post-processing, and creating metrics using these datasets, please see [`data`](https://github.com/alexdseo/mint/blob/main/data).
+MINT uses data from multiple sources, including high-quality generic food items, large-scale recipe datasets, LLM-generated synthetic data labels, and real-world restaurant menu items in the United States. For more details on producing embeddings, generating labels, post-processing, and creating metrics using these datasets, please see [`data`](https://github.com/alexdseo/mint/blob/main/data).
 
-MINT consists of two modeling components, clustering and food category-specific predictions. Aftering initial clustering, we provide two options to train MINT using differnt deep learning frameworks, TensorFlow and PyTorch. For more details, please see [`modeling`](https://github.com/alexdseo/mint/tree/main/modeling).
+MINT consists of two modeling components, clustering and food category-specific predictions. After initial clustering, we provide two options to train MINT using different deep learning frameworks, TensorFlow and PyTorch. For more details, please see [`modeling`](https://github.com/alexdseo/mint/tree/main/modeling).
 
-Following the nutrient density prediction using MINT, we can estimate restuarant-level and food environment-level nutrient density. These metrics can be used to analyze and map the nutritional health of the United States. For more detials, please see [`analysis`](https://github.com/alexdseo/mint/tree/main/analysis). 
+Following the nutrient density prediction using MINT, we can estimate restaurant-level and food environment-level nutrient density. These metrics can be used to analyze and map the nutritional health of the United States. For more details, please see [`analysis`](https://github.com/alexdseo/mint/tree/main/analysis). 
 
 ## Community Support
 
