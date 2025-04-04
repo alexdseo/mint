@@ -2,9 +2,11 @@
   <img src="https://github.com/alexdseo/mint/blob/main/figures/mint_logo.png"/>
 </p>
 
+<!---
 <div align="center">
-  <h2>Menu Item to NutrienT</h2>
+  <h1>Menu Item to NutrienT</h1>
 </div>
+--->
 
 --- 
 
