@@ -203,10 +203,11 @@ if __name__ == "__main__":
     np.save('./files/training_ingr_sentence_embeddings_mpnet.npy', ingr_setence_embeddings)
 
     # Read Inference dataset
+    inference_all = pd.read_csv('./files/restaurant_inference_sample.csv', low_memory=False, lineterminator='\n')
     # Menus without description
-    inference_menu = pd.read_csv('./files/restaurant_inference_nandes_sample.csv', low_memory=False, lineterminator='\n')
+    inference_menu = inference_all[inference_all['description'].isna()].reset_index(drop=True)
     # Menus with descriptions
-    inference_desc = pd.read_csv('./files/restaurant_inference_des_sample.csv', low_memory=False, lineterminator='\n')
+    inference_desc = inference_all[inference_all['description'].notna()].reset_index(drop=True)
 
     # Retrieve RecipeFT embeddings # Inference
     recipeft_we_inf = recipeft(inference_menu)

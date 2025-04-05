@@ -9,17 +9,10 @@ def outlier_detection(csv):
         `ol_1p.csv`: csv files with outlier restaurant ID with menu less than 6 itmes or more than 692 items.
     """
     # Save number of menu per restaurant
-    num_menu = pd.DataFrame()
-    # Large-scale dataset divided in 10 batches
-    for i in tqdm(range(1, 11)):
-        inference_complete = pd.read_csv(csv, low_memory=False, lineterminator='\n')
-        num_menu_tmp = pd.DataFrame(inference_complete.groupby(['restaurant_ID']).count()['menu_ID'])
-        # print(len(x))
-        num_menu_tmp['restaurant_ID'] = num_menu_tmp.index
-        num_menu_tmp = num_menu_tmp.reset_index(drop=True)
-        num_menu = pd.concat([num_menu, num_menu_tmp])
-    num_menu = num_menu.reset_index(drop=True)
-    num_menu = num_menu[['restaurant_ID', 'menu_ID']]
+    inference_complete = pd.read_csv(csv, low_memory=False, lineterminator='\n')
+    num_menu = pd.DataFrame(inference_complete.groupby(['restaurant_ID']).count()['menu_ID'])
+    num_menu['restaurant_ID'] = num_menu.index
+    num_menu = num_menu[['restaurant_ID', 'menu_ID']].reset_index(drop=True)
     num_menu = num_menu.rename(columns={'menu_ID': 'count'})
     # <6 and >692 # 1% from each tails
     ol_1p = num_menu[(num_menu['count'] < 6) | (num_menu['count'] > 692)]['restaurant_ID']
@@ -27,7 +20,4 @@ def outlier_detection(csv):
     ol_1p.to_csv('ol_1p.csv',index=False)
 
 if __name__ == "__main__":
-    files = ['./files/restaurant_inference_nandes_sample.csv',
-             './files/restaurant_inference_des_sample.csv']
-    for file in files:
-        outlier_detection(csv=file)
+    outlier_detection(csv='./files/restaurant_inference_sample.csv')
