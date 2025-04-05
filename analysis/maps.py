@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from analysis.utils import *
-import sys
+import argparse
 from shapely import wkt
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -210,13 +210,16 @@ class GetMaps:
 
 if __name__ == "__main__":
     # Get arguments for score
-    nds = sys.argv[1]  # nutrition desnsity score # ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA
-    # All (>0), 30% (>3), 50% (>15), and 70% (>80) for sensitivity analysis
-    threshold = sys.argv[2] # ex) 0, 30, 50, 70
-    county_df = pd.read.csv(f"../data/files/FEND_{nds}.csv", dtype={'CountyFIPS':str})
-    ct_df = pd.read.csv(f"../data/files/FEND_{nds}_ct.csv", dtype={'TractFIPS':str})
+    parser = argparse.ArgumentParser(description="Run the script with nutrient density score of interest and threshold.")
+    parser.add_argument('nds', type=str, help="Nutrition desnsity score. ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA")
+    # All (>0; restaurants), 30% (>3; restaurants), 50% (>15; restaurants), and 70% (>80; restaurants)
+    parser.add_argument('threshold', type=int, help="All, 30%, 50%, and 70% threshold for sensitivity analysis. ex) 0, 30, 50, 70")
+    args = parser.parse_args()
+    # Read FEND datasets
+    county_df = pd.read.csv(f"../data/files/FEND_{args.nds}.csv", dtype={'CountyFIPS':str})
+    ct_df = pd.read.csv(f"../data/files/FEND_{args.nds}_ct.csv", dtype={'TractFIPS':str})
     # 50% thresholding (>15): main result 
-    county_df_main = thresholding(threshold, county_df)
+    county_df_main = thresholding(args.threshold, county_df)
     # NYC FEND df and boundary outline
     nyc_ct_fend = pd.read_csv('../data/files/nyc_ct_fend.csv')
     nyc_ct = gpd.read_file('../data/files/nyct2020_23c/nyct2020.shp')

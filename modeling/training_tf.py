@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, LeakyReL
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.metrics import r2_score
 import scipy.stats as st
-import sys
+import argparse
 
 
 class NNArchitecture(keras.Model):
@@ -465,18 +465,19 @@ if __name__ == "__main__":
     # Set seed
     np.random.seed(2025)
     # Get arguments for score and fold that wanted to test 
-    nds = sys.argv[1]  # nutrition desnsity score # ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA
-    fold = sys.argv[2]  # one of the folds to test on # ex) kf1 ~ kf5
-    # Read one of the fold's training and test index # Created using utils.set_fold
-    # User can change this part and try different folds
-    train_ind = np.load(f"{fold}_tr.npy")
-    test_ind = np.load(f"{fold}_ts.npy")
+    parser = argparse.ArgumentParser(description="Run the script with nutrient density score of interest and fold to test on.")
+    parser.add_argument('nds', type=str, help="Nutrition desnsity score. ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA")
+    parser.add_argument('fold', type=str, help=" ex) Folds created from clustering.py, test for cross-validation. ex) kf1, kf2, kf3, kf4, kf5")
+    args = parser.parse_args()
+    # Read one of the fold's training and test index # Created by running clutering.py from utils.set_fold
+    train_ind = np.load(f"{args.fold}_tr.npy")
+    test_ind = np.load(f"{args.fold}_ts.npy")
     # Read FastText embeddings
     X = np.load('../data/files/training_menu_embedding_recipeft.npy')
     # Define training and test dataset
     X_train, X_test = X[train_ind], X[test_ind]
     # Read one of the fold that was created from the clustering.py
-    y_train = pd.read_csv(f"training_{fold}.csv")
+    y_train = pd.read_csv(f"training_{args.fold}.csv")
     num_sc = len(set(y_train['sc']))
     # Full dataset without fodd category
     y = pd.read_csv('../data/files/generic_food_training_nutrition_sample.csv')
@@ -486,8 +487,8 @@ if __name__ == "__main__":
 
     mint = Pipeline()
     # Run baseline method and get the predicted food category for the test dataset
-    y_test = mint.baseline(num_sc, X_train, X_test, y_train, y_test, nds)
+    y_test = mint.baseline(num_sc, X_train, X_test, y_train, y_test, args.nds)
     # Run vanila mlp method and save weight for finetuning process
-    mint.mlp(X_train, X_test, y_train, y_test, nds, fold)
+    mint.mlp(X_train, X_test, y_train, y_test, args.nds, args.fold)
     # Run MINT
-    mint.mint(num_sc, X_train, X_test, y_train, y_test, nds, fold)
+    mint.mint(num_sc, X_train, X_test, y_train, y_test, args.nds, args.fold)

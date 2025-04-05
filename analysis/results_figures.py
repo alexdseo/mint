@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 import ast
-import sys
+import argparse
 
 
 class GetResults:
@@ -241,13 +241,16 @@ class GetResults:
 
 if __name__ == "__main__":
     # Get arguments for score
-    nds = sys.argv[1]  # nutrition desnsity score # ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA
-    # All (>0), 30% (>3), 50% (>15), and 70% (>80) for sensitivity analysis
-    threshold = sys.argv[2] # ex) 0, 30, 50, 70
-    county_df = pd.read.csv(f"../data/files/FEND_{nds}.csv", dtype={'CountyFIPS':str})
-    ct_df = pd.read.csv(f"../data/files/FEND_{nds}_ct.csv", dtype={'TractFIPS':str})
+    parser = argparse.ArgumentParser(description="Run the script with nutrient density score of interest and threshold.")
+    parser.add_argument('nds', type=str, help="Nutrition desnsity score. ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA")
+    # All (>0; restaurants), 30% (>3; restaurants), 50% (>15; restaurants), and 70% (>80; restaurants)
+    parser.add_argument('threshold', type=int, help="All, 30%, 50%, and 70% threshold for sensitivity analysis. ex) 0, 30, 50, 70")
+    args = parser.parse_args()
+    # Read FEND datasets
+    county_df = pd.read.csv(f"../data/files/FEND_{args.nds}.csv", dtype={'CountyFIPS':str})
+    ct_df = pd.read.csv(f"../data/files/FEND_{args.nds}_ct.csv", dtype={'TractFIPS':str})
     # 50% thresholding (>15): main result 
-    county_df_main = thresholding(threshold, county_df)
+    county_df_main = thresholding(args.threshold, county_df)
     # Get results # Plot figures
     results = GetResults(df=county_df_main)
     results.correlation_heatmap()
@@ -255,4 +258,4 @@ if __name__ == "__main__":
     results.metro_rural_test()
     results.decile_analysis()
     results.ee_barplot(df=pd.read.csv("main_linear_model_table.csv")) # Import linear model results as table
-    results.extra_lm(df_ct=ct_df, ruca=pd.read_excel('ruca2010revised.xlsx').iloc[1:,0:5], th=threshold) # census-tracts
+    results.extra_lm(df_ct=ct_df, ruca=pd.read_excel('ruca2010revised.xlsx').iloc[1:,0:5], th=args.threshold) # census-tracts

@@ -4,7 +4,7 @@ import hdbscan
 import umap
 from modeling.utils import *
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
-import sys
+import argparse
 
 
 class FoodCategorySoftClustering:
@@ -148,11 +148,13 @@ class FoodCategorySoftClustering:
 
 if __name__ == "__main__":
     # Get arguments
-    tuning = sys.argv[1]  # Perform hyperparmeter for tuning or not # boolean (True or False)
+    parser = argparse.ArgumentParser(description="Run the script with an option for hyperparmeter tuning")
+    parser.add_argument('tuning', type=bool, help="Perform hyperparmeter for tuning or not. ex) True, False")
+    args = parser.parse_args()
     # Clustering
     create_food_category = FoodCategorySoftClustering()
     # Tuning hyperparameter for clustering
-    if tuning:
+    if args.tuning:
         best_params = create_food_category.tuning()
         create_food_category.clustering(n_comp=best_params['n_components'], n_neigh=best_params['n_neighbors'],
                                         eps=best_params['epsilon'], min_sam=best_params['min_samples'])
