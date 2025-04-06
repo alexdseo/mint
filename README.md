@@ -27,7 +27,7 @@ Details of the MINT model are described below:
 
 **Nutrient Density (ND) Prediction Training.** We independently train a feed-forward neural network to predict the nutrient density score with uncertainty estimates via Monte Carlo dropout using menu embeddings and description embeddings. The model is 1) pre-trained on the entire dataset and then 2) fine-tuned separately based on food category training labels, enabling it to serve as an expert model for each specific food category in predicting nutrient density scores.
 
-**Inference.** We take $\approx 600,000$ menu items from the US restaurants and encode their name using the RecipeFT, to predict their most likely food category via neural network with softmax for classification. Based on the availability of descriptions, we determine the appropriate model (name-based or description-based) and input type to allocate each menu item to the corresponding fine-tuned expert model according to the predicted food category.
+**Inference.** We take menu items from $\approx 600,000$ US restaurants and encode their name using the RecipeFT, to predict their most likely food category via neural network with softmax for classification. Based on the availability of descriptions, we determine the appropriate input type and model (name-based or description-based) to allocate each menu item to the corresponding fine-tuned expert model according to the predicted food category.
 
 
 ## Quickstart
