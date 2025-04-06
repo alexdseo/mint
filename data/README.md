@@ -1,30 +1,44 @@
 # Data
 
-## Required dataset
+## Data Preparations
 
-Here we describe about the required datasets to create MINT. The first dataset, [Recipe1M+](http://im2recipe.csail.mit.edu/), is a large-scale structured dataset containing over 1 million food names, ingredients, and recipes. We will use this dataset to train the FastText model, so we can create word embeddings for our main dataset. The full dataset(`layer1.json`) is available for access through their [website](http://im2recipe.csail.mit.edu/). 
+MINT is trained with a high-quality dataset that contains generic food items - canonical foods, including everything from individual raw foods to complex meals – with their list of ingredients and full nutrient composition information. This dataset was curated and shared for research purposes by the nutrition data company [Edamam Inc](https://www.edamam.com/). 
+The dataset is based on recipe and food composition data from multiple sources, including the U.S. Department of Agriculture's (USDA) Food Data Central, and curated to ensure the accuracy of these data. This dataset is preferred due to its unbiased representation of food items, deprived of any retailer-specific biases, and its comprehensive coverage across various food categories. The dataset can be accessed through their API, or contact the company for the full dataset, if needed it for research purpose. In [`files`](https://github.com/alexdseo/mint/tree/main/data/files), samples of the this training dataset is included.
 
-Then we would need our main dataset, high-quality generic food items with their list of ingredients and full nutrient composition information. This dataset was curated and shared for research purposes by the nutrition data company [Edamam Inc](https://www.edamam.com/). Edamam dataset will be used to train the nutrition prediction model using their menu item name and nutrition information, and to create sentence embeddings using their menu item name and its list of ingredients. The sentence embeddings will be created by utilizing pre-trained MPNet. The dataset can be accessed through their API or, if you need it for research purpose, contact them for the full dataset.
+We also utilize [Recipe1M+](http://im2recipe.csail.mit.edu/), a large-scale structured dataset containing over 1 million food names, ingredients, and recipes. The dataset is used to train the language models, for producing embeddings that will be used to train the MINT. The full dataset(`layer1.json`) is available for access through their [website](http://im2recipe.csail.mit.edu/). Model weights for **RecipeFT**, a FastText model trained with Recipe1M+, can be downloaded [here](https://drive.google.com/drive/folders/16yGJUie7fu2ZdIwoRbHEGyQU4uLj9jlH) and **RecipeBERT**, a BERT model trained with Recipe1M+, can be downloaded through our huggingface repository [here](https://huggingface.co/alexdseo/RecipeBERT).
 
-In this folder, we included samples of the Edamam dataset `edamam_ingredients_sample.csv`, which includes the menu items and their ingredients, and `edamam_nutrition_sample.csv`, which includes the menu items and their nutrition information.
+Produce all embeddings:
+```
+cd data
+python embeddings.py
+```
 
-You can run [`create_embeddings.py`](https://github.com/alexdseo/mint/blob/main/data/create_embeddings.py) to create word embeddings of each menu item (averaged by all words) from the Edamam dataset, and also to create sentence embeddings using menu item names and its list of ingredients from the Edamam dataset. Before running this file, you have to get access to the [Recipe1M+](http://im2recipe.csail.mit.edu/) dataset, in order to train the FastText model. We specifically used the `layer1.json` dataset, which includes all of the texts for each menu item. 
+We leverage ChatGPT API to generate synthetic data labels including AMDD (Appetizers, Main-dish, Dessert, and Drink) labels and one-line menu description. This synthetic data are used to train the MINT model and classify the menu types.
 
-<!---
-## Language Models
+Generate synthetic data (`OpenAI API key needed`):
+```
+python LLM_data_augmentation.py
+```
 
-- Model weights for **RecipeFT** can be downloaded [here](https://drive.google.com/drive/folders/16yGJUie7fu2ZdIwoRbHEGyQU4uLj9jlH)
-- **RecipeBERT** can be downloaded through our huggingface repository [here](https://huggingface.co/alexdseo/RecipeBERT)
---->
+## Creating Metrics
 
-## Dataset for the application
+A large-scale real-world menu item dataset comprising approximately 70 million menu items from 600,000 restaurants that was sourced in 2020 from Edamam is used as the inference dataset in this project. Our preliminary investigation reveals that the dataset contains restaurants with incomplete menu entries with a minimal number of items, as well as entries from local delis and liquor stores that list an extensive inventory. Therfore, we remove 1% of the dataset from both ends of the national distribution of the menu counts per restaurant. Specifically, restaurants with fewer than 6 menu items or more than 692 menu items are discarded.
 
-After training the MINT using the `Recipe1M+` and the `Edamam` dataset, you can make an inference on the menu item's nutrition density score from different datasets. In our paper, we made a real-world application using [Spoonacular](https://spoonacular.com/food-api) dataset, which contains chain restaurant menu item's nutrient values, published by each restaurant as required by the Affordable Care 468 Act (ACA). Their dataset is available for access through their [API](https://spoonacular.com/food-api).
+Detect outliers in the inference data:
+```
+python outlier_detection.py
+```
 
-We then used the restaurant location data from [Los Angeles County Restaurant and Market Inventory](https://data.lacounty.gov/), which contains the locations for all registered restaurants in Los Angeles County. Some of the chain restaurants with more than 10 locations in LA county but was not listed on `Spoonacular`'s database, were manually extracted by us from each of the restaurant's official website. This dataset is listed in this folder: `extracted_menu_items.csv`.
+After getting the prediction of the nutrient density on the inference dataset using trained MINT, we estimate restaurant-level nutrient density (RND) and food environmnet nutrient density (FEND). 
 
-Using these datasets, and trained MINT, you can evaluate the chain restaurant food environment -- the physical spaces in which people access and consume food-- in LA County:
+Estimate RND and FEND based on RRR (options: RRR, NRF9.3, NRF6.3, LIM, WHO, FSA):
+```
+python estimate_RND.py RRR
+python estimate_FEND.py RRR
+```
 
-![Application to LA County data](https://github.com/alexdseo/mint/blob/main/figures/heatmap.png)
+Our analysis workflow is shown below, along with examples of ground truth RND score of national fast food chains.
 
-For this map, the median $RRR−macro$ of the menu was used to evaluate each chain restaurant. Which, were averaged across all chain restaurants in neighborhoods to evaluate the food environment. (a) MINT restaurant quality predictions and (b) Ground truth restaurant quality.
+![Workflow](https://github.com/alexdseo/mint/blob/main/figures/intro_fig.png)
+
+
