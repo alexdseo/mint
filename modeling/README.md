@@ -1,18 +1,16 @@
 # Modeling
 
-## Pipeline
+The model pipeline consists of 3 steps, first producing embeddings through trained food-specific language model (run `../data/embeddings.py`), then clustering the training data to create the food category pseudo-labels. 
 
-Here we explain how to run the MINT pipeline, to make the food category and nutrition density score prediction using only the menu item's name.
+Create food category pseudo-labels on the training dataset with option for hyperparameter tuning (`False` uses tuned parameters; `True` runs the tuning process):
+```
+python clustering.py False
+```
 
-- `utils.py`: 
-> This Python script includes a training-test split for multiple folds, and the equation to calculate nutrition density scores, $RRR$ and $RRR-macro$.
-- `clustering.py`: 
-> This Python script includes the functions to cluster the sentence embeddings created by running [`create_embeddings.py`](https://github.com/alexdseo/mint/blob/main/data/create_embeddings.py). Therefore, [`create_embeddings.py`](https://github.com/alexdseo/mint/blob/main/data/create_embeddings.py) needs to be run prior to running this script.  We use a combination of UMAP and HDBSCAN to cluster them, where you can also try different hyperparameters to see the difference in results by exploring the tuning option. The clustering example for one of the folds is shown below.
-- `nn_architectures.py`: 
-> This Python script includes the neural network architectures for the food category prediction model and nutrition prediction model. These models will be called in `models.py`.
-- `models.py`:
-> This Python script includes the functions to call the MINT and its comparisons used in our ablation study. `clustering.py` needs to be run prior to running this script.
+After clustering process, train MINT on desired nutrient density score (options: RRR, NRF9.3, NRF6.3, LIM, WHO, FSA). Choose one of the 5 folds (options: kf1, kf2, kf3, kf4, kf5) to test on for cross-validation and reproducing results in the manuscript. PyTorch and Tensorflow both available to use for training MINT:
+```
+python training_torch.py RRR kf1
+python training_tf.py RRR kf1
+```
 
-> 2 arguments required: 'nutrition density score', either RRR or RRR_m1. 'folds', from kf1 to kf5 that user want to test on.
-
-![clustering example](https://github.com/alexdseo/mint/blob/main/figures/clustering.png)
+<!-- Confidence interval and error analysis for checking the robustness of MINT predictions are included in this [notebook](https://gist.github.com/alexdseo/27babc1fc313d412630bf07b54b64c2f). -->
