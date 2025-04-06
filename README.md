@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/alexdseo/mint/blob/main/figures/mint_logo.png" alt="drawing" style="width:350px;"/>
+  <img src="https://github.com/alexdseo/mint/blob/main/figures/mint_logo.png" alt="logo" style="width:350px;"/>
 </p>
 
 <div align="center">
