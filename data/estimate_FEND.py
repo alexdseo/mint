@@ -98,7 +98,7 @@ def estimate_FEND(RND_df, meal_type, county_ho, nds):
     FEND_df = FEND_df.merge(min_RND[['CountyFIPS','min_RND']], how='left', on=['CountyFIPS'])
 
     # merge with gpd # Additional Diet-related diseases: 'HIGHCHOL_AdjPrev', 'BPHIGH_AdjPrev',
-    FEND_df = FEND_df.merge(county_ho[['CountyFIPS', 'StateAbbr', 'CountyName', 'TotalPopulation',
+    FEND_df = FEND_df.merge(county_ho[['CountyFIPS', 'StateAbbr', 'CountyName',
                                        'OBESITY_AdjPrev', 'DIABETES_AdjPrev', 'CHD_AdjPrev',
                                        'geometry']], how='left', on=['CountyFIPS'])
     
@@ -389,7 +389,7 @@ if __name__ == "__main__":
     parser.add_argument('nds', type=str, help="Nutrition desnsity score. ex) RRR, NRF9.3, NRF6.3, LIM, WHO, FSA")
     args = parser.parse_args()
     # CDC PLACES Community Health Outcomes # County-level # 2020 release
-    county_ho = pd.read_csv('PLACES__County_Data__GIS_Friendly_Format___2020_release.csv', dtype={'CountyFIPS':str}) 
+    county_ho = pd.read_csv('./files/PLACES__County_Data__GIS_Friendly_Format___2020_release.csv', dtype={'CountyFIPS':str}) 
     # County boundaries
     county_boundary = gpd.read_file('./files/cb_2015_us_county_500k/cb_2015_us_county_500k.shp')
     county_df = county_data(county_ho, county_boundary)
@@ -414,10 +414,10 @@ if __name__ == "__main__":
     # Socioeconomic and Spatial Differences (SES) # Race/Ethnicity, Demographics, and etc.
     FEND = merge_ses(state_code, FEND)
     # Traditional Indicators (CDC_mRFEI, Limited-Service Restaurant (LSR) Density, USDA_%LowAccess)
-    mrfei = pd.read_excel(open('cdc_61367_DS2.xlsx', 'rb'), dtype={'fips':str})# mRFEI
-    lsr_2020 = pd.read_csv('CBP2020.CB2000CBP-Data.csv', low_memory=False) # Number of LSR -2020v
-    lsr_2021 = pd.read_csv('CBP2021.CB2100CBP-Data.csv',low_memory=False) # Number of LSR -2021v
-    food_access = pd.read_excel(open('FoodAccessResearchAtlasData2019.xlsx', 'rb'), sheet_name='Food Access Research Atlas', dtype={'CensusTract':str}) # USDA_%LowAccess
+    mrfei = pd.read_excel(open('./files/cdc_61367_DS2.xlsx', 'rb'), dtype={'fips':str})# mRFEI
+    lsr_2020 = pd.read_csv('./files/CBP2020.CB2000CBP-Data.csv', low_memory=False) # Number of LSR -2020v
+    lsr_2021 = pd.read_csv('./files/CBP2021.CB2100CBP-Data.csv',low_memory=False) # Number of LSR -2021v
+    food_access = pd.read_excel(open('./files/FoodAccessResearchAtlasData2019.xlsx', 'rb'), sheet_name='Food Access Research Atlas', dtype={'CensusTract':str}) # USDA_%LowAccess
     FEND = merge_traditional_indicators(FEND, mrfei, lsr_2020, lsr_2021, food_access)
     
     # Export FEND data as csv
