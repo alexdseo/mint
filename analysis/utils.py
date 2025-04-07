@@ -64,7 +64,7 @@ def get_map_colors(metric):
     # Color schemes
     color_schemes = {
         'FEND': ['#d73027', '#fc8d59', '#fee090', '#91bfdb', '#4575b4'],  # RdYlBu
-        'RND STDEV': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],  # Plasma
+        'RND_STDEV': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],  # Plasma
         'CDC mRFEI': ['#00224e', '#304f7a', '#636675', '#a6977b', '#ffe345'],  # Cividis
         'USDA %LowAccess': ['#deebf7', '#9ecae1', '#6baed6', '#3182bd', '#08519c'],  # Blues
         'LSR Density': ['#fde725', '#90d743', '#35b779', '#31688e', '#440154'],  # Viridis_r

@@ -25,7 +25,7 @@ class GetResults:
         self.pop_threshold = pop_threshold
         self.bar_width = 0.2
         self.bar_colors = ['#4878D0', '#D65F5F', '#6ACC64','#EE854A']
-        self.features = ['FEND', 'RND STDEV', 'CDC mRFEI', 'USDA %LowAccess', 'LSR Density', '#Restaurants',
+        self.features = ['FEND', 'RND_STDEV', 'CDC mRFEI', 'USDA %LowAccess', 'LSR Density', '#Restaurants',
                         'Obesity Prevalence', 'Diabetes Prevalence', 'CHD Prevalence', 'Total Population (log-scaled)',
                         '%Black',  '%Asian', '%Hispanic', '%White', 'Median Age', 'Median Income', 'Employment Rate',
                         '%LowSkillJob', '%CollegeEdu', '%PublicTransportation', '%LongComute', 'Gini Index']
@@ -203,9 +203,9 @@ class GetResults:
         # Normalize for linear modeling
         metro_ct, rural_ct = normalize(metro_ct, ct_features), normalize(rural_ct, ct_features)
         main_ct = normalize(main_ct, ct_features)
-        # FEND/RND STDEV ~ SES
+        # FEND/RND_STDEV ~ SES
         vif_vars = [item for item in self.covariates if item != '%White'] # Remove '%White' based on vif results
-        for metric in ['FEND', 'RND STDEV']:
+        for metric in ['FEND', 'RND_STDEV']:
             metro_model = linear_model(metro_ct, metric, vif_vars) # Use vif_vars for metro_model
             rural_model = linear_model(rural_ct, metric, self.covariates)
             main_model = linear_model(main_ct, metric, self.covariates)
@@ -224,7 +224,7 @@ class GetResults:
         for ho in ['Obesity Prevalence', 'Diabetes Prevalence', 'CHD Prevalence']:
             # Report
             lines = [f"# {ho}~FE metrics+SES Model Summary Report\n"]
-            for metric in ['FEND', 'RND STDEV', 'USDA %LowAccess', 'CDC mRFEI']:
+            for metric in ['FEND', 'RND_STDEV', 'USDA %LowAccess', 'CDC mRFEI']:
                 all_vars = [metric] + vif_vars
                 if metric in ['USDA %LowAccess', 'CDC mRFEI']:
                     adjm_df = remove_na(main_ct, metric) # Remove NA data for 'USDA %LowAccess', 'CDC mRFEI' in census tracts

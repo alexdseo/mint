@@ -20,7 +20,7 @@ class GetMaps:
         ):
         self.random_seed = random_seed
         self.percentiles = [0, 20, 40, 60, 80, 100]
-        self.metrics = ['FEND', 'RND STDEV', 'CDC mRFEI', 'USDA %LowAccess', 'LSR Density', '#Restaurants']
+        self.metrics = ['FEND', 'RND_STDEV', 'CDC mRFEI', 'USDA %LowAccess', 'LSR Density', '#Restaurants']
         self.df = rename(df) # Rename columns
         # To gpd
         self.df = self.to_gpd(self.df)
@@ -134,7 +134,7 @@ class GetMaps:
         # To gpd
         fend_df = self.to_gpd(fend_df)
         # NYC and LA maps
-        for metric in ['FEND', 'RND STDEV', 'CDC mRFEI', '#Restaurants']:
+        for metric in ['FEND', 'RND_STDEV', 'CDC mRFEI', '#Restaurants']:
             if metric == 'CDC mRFEI':
                 ct_df = remove_na(self.ct_all, metric)
             else:
