@@ -414,7 +414,7 @@ if __name__ == "__main__":
     # Socioeconomic and Spatial Differences (SES) # Race/Ethnicity, Demographics, and etc.
     FEND = merge_ses(state_code, FEND)
     # Traditional Indicators (CDC_mRFEI, Limited-Service Restaurant (LSR) Density, USDA_%LowAccess)
-    mrfei = pd.read_excel(open('./files/cdc_61367_DS2.xlsx', 'rb'), dtype={'fips':str})# mRFEI
+    mrfei = pd.read_excel(open('./files/cdc_61367_DS2.xls', 'rb'), dtype={'fips':str})# mRFEI
     lsr_2020 = pd.read_csv('./files/CBP2020.CB2000CBP-Data.csv', low_memory=False) # Number of LSR -2020v
     lsr_2021 = pd.read_csv('./files/CBP2021.CB2100CBP-Data.csv',low_memory=False) # Number of LSR -2021v
     food_access = pd.read_excel(open('./files/FoodAccessResearchAtlasData2019.xlsx', 'rb'), sheet_name='Food Access Research Atlas', dtype={'CensusTract':str}) # USDA_%LowAccess
